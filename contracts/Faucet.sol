@@ -6,7 +6,7 @@ import "./USDC.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Faucet is Ownable {
-    USDC public token;
+    Token public token;
     uint256 public amount;
     uint256 public startTimestamp;
     uint256 public fee = 1e15; // 0.001 ETH
@@ -14,9 +14,9 @@ contract Faucet is Ownable {
     mapping(address => uint256) public lastSavedTimestamp;
     mapping(bytes32 => bool) public previousHashedMessages;
 
-    constructor(USDC _token, address _fee_collector, uint256 _startTimestamp) {
+    constructor(address _token, address _fee_collector, uint256 _startTimestamp) {
         fee_collector = _fee_collector;
-        token = _token;
+        token = Token(_token);
         amount = 500 * (10 ** token.decimals());
         startTimestamp = _startTimestamp;
     }
