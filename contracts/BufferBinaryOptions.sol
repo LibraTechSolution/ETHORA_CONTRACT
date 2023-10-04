@@ -3,7 +3,7 @@
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+// import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./interfaces/interfaces.sol";
@@ -18,7 +18,7 @@ import "./library/OptionMath.sol";
 contract BufferBinaryOptions is
     IBufferBinaryOptions,
     ReentrancyGuard,
-    ERC721,
+    // ERC721,
     AccessControl
 {
     using SafeERC20 for ERC20;
@@ -38,12 +38,13 @@ contract BufferBinaryOptions is
     mapping(uint256 => Option) public override options;
     mapping(address => uint256[]) public userOptionIds;
     mapping(address => bool) public approvedAddresses;
+    mapping(uint256 => address) public override optionOwners; 
     bytes32 public constant ROUTER_ROLE = keccak256("ROUTER_ROLE");
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
 
-    constructor() ERC721("Buffer", "BFR") {
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-    }
+    // constructor() ERC721("Buffer", "BFR") {
+    //     _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+    // }
 
     /************************************************
      *  INITIALIZATION FUNCTIONS
@@ -130,7 +131,8 @@ contract BufferBinaryOptions is
         optionID = _generateTokenId();
         userOptionIds[optionParams.user].push(optionID);
         options[optionID] = option;
-        _mint(optionParams.user, optionID);
+        // _mint(optionParams.user, optionID);
+        optionOwners[optionID] = optionParams.user;
 
         uint256 referrerFee = _processReferralRebate(
             optionParams.user,
@@ -184,7 +186,7 @@ contract BufferBinaryOptions is
         uint256 closingTime,
         bool isAbove
     ) external override onlyRole(ROUTER_ROLE) {
-        require(_exists(optionID), "O10");
+        require(optionID < nextTokenId, "O10");
         Option storage option = options[optionID];
         require(option.state == State.Active, "O5");
 
@@ -197,7 +199,8 @@ contract BufferBinaryOptions is
         } else {
             option.state = State.Expired;
             pool.unlock(optionID);
-            _burn(optionID);
+            // _burn(optionID);
+            delete optionOwners[optionID];
             emit Expire(optionID, option.premium, closingPrice, isAbove);
         }
         totalMarketOI -= option.totalFee;
@@ -328,23 +331,23 @@ contract BufferBinaryOptions is
         return a < b ? a : b;
     }
 
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view override(ERC721, AccessControl) returns (bool) {
-        return super.supportsInterface(interfaceId);
-    }
+    // function supportsInterface(
+    //     bytes4 interfaceId
+    // ) public view override(ERC721, AccessControl) returns (bool) {
+    //     return super.supportsInterface(interfaceId);
+    // }
 
-    function ownerOf(
-        uint256 tokenId
-    )
-        public
-        view
-        virtual
-        override(ERC721, IBufferBinaryOptions)
-        returns (address)
-    {
-        return super.ownerOf(tokenId);
-    }
+    // function ownerOf(
+    //     uint256 tokenId
+    // )
+    //     public
+    //     view
+    //     virtual
+    //     override(ERC721, IBufferBinaryOptions)
+    //     returns (address)
+    // {
+    //     return super.ownerOf(tokenId);
+    // }
 
     /************************************************
      *  INTERNAL OPTION UTILITY FUNCTIONS
@@ -377,7 +380,7 @@ contract BufferBinaryOptions is
         bool isAbove
     ) internal returns (uint256 profit) {
         Option storage option = options[optionID];
-        address user = ownerOf(optionID);
+        address user = optionOwners[optionID];
         if (option.expiration > closingTime) {
             profit =
                 (option.lockedAmount *
@@ -404,7 +407,8 @@ contract BufferBinaryOptions is
         else emit LpLoss(optionID, profit - option.premium);
 
         // Burn the option
-        _burn(optionID);
+        // _burn(optionID);
+        delete optionOwners[optionID];
         option.state = State.Exercised;
         emit Exercise(user, optionID, profit, closingPrice, isAbove);
     }
@@ -498,14 +502,14 @@ contract BufferBinaryOptions is
         approvedAddresses[addressToApprove] = true;
     }
 
-    function _beforeTokenTransfer(address from, address to, uint256 firstTokenId, uint256 batchSize) internal virtual override {
-        if (
-            from != address(0) &&
-            to != address(0) &&
-            approvedAddresses[to] == false &&
-            approvedAddresses[from] == false
-        ) {
-            revert("Token transfer not allowed");
-        }
-    }
+    // function _beforeTokenTransfer(address from, address to, uint256 firstTokenId, uint256 batchSize) internal virtual override {
+    //     if (
+    //         from != address(0) &&
+    //         to != address(0) &&
+    //         approvedAddresses[to] == false &&
+    //         approvedAddresses[from] == false
+    //     ) {
+    //         revert("Token transfer not allowed");
+    //     }
+    // }
 }

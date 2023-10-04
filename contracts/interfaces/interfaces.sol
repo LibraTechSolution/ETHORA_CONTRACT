@@ -247,7 +247,7 @@ interface IBufferBinaryOptions {
 
     function token1() external view returns (string memory);
 
-    function ownerOf(uint256 id) external view returns (address);
+    function optionOwners(uint256) external view returns (address);
 
     function assetPair() external view returns (string memory);
 

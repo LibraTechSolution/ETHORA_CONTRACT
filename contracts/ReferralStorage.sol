@@ -19,6 +19,7 @@ contract ReferralStorage is IReferralStorage, Ownable {
     mapping(address => string) public userCode;
     mapping(address => string) public override traderReferralCodes;
     mapping(address => ReferralData) public UserReferralData;
+    mapping(address => bool) public operators;
 
     /**
      * @notice Sets the config for step reduction and discount on the basis of tier
@@ -40,15 +41,22 @@ contract ReferralStorage is IReferralStorage, Ownable {
      *  ADMIN ONLY FUNCTIONS
      ***********************************************/
 
+    function setOperator(address operator, bool state)
+        external
+        onlyOwner
+    {
+        operators[operator] = state;
+    }
+
     /**
      * @notice Sets referrer's tier
      */
     function setReferrerTier(address _referrer, uint8 tier)
         external
         override
-        onlyOwner
     {
         require(tier < 3);
+        require(operators[msg.sender], "not operator");
         referrerTier[_referrer] = tier;
         emit UpdateReferrerTier(_referrer, tier);
     }
@@ -59,8 +67,8 @@ contract ReferralStorage is IReferralStorage, Ownable {
     function setTraderReferralCode(address user, string memory _code)
         external
         override
-        onlyOwner
     {
+        require(operators[msg.sender], "not operator");
         _setTraderReferralCode(user, _code);
     }
 
@@ -84,6 +92,7 @@ contract ReferralStorage is IReferralStorage, Ownable {
             codeOwner[_code] == address(0),
             "ReferralStorage: code already exists"
         );
+        require(bytes(userCode[msg.sender]).length == 0, "created code");
 
         codeOwner[_code] = msg.sender;
         userCode[msg.sender] = _code;
@@ -110,6 +119,7 @@ contract ReferralStorage is IReferralStorage, Ownable {
      ***********************************************/
 
     function _setTraderReferralCode(address user, string memory _code) private {
+        require(bytes(traderReferralCodes[user]).length == 0, "created code");
         traderReferralCodes[user] = _code;
         emit UpdateTraderReferralCode(user, _code);
     }
