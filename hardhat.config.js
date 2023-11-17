@@ -74,7 +74,7 @@ module.exports = {
   solidity: {
     compilers: [
       {
-        version: "0.8.4",
+        version: "0.8.8",
         settings: {
           optimizer: {
             enabled: true,
@@ -111,6 +111,17 @@ module.exports = {
       }
 
     ],
+    overrides: {
+      "@openzeppelin/contracts-upgradeable/utils/cryptography/EIP712Upgradeable.sol": {
+        version: "0.8.8",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200
+          }
+        }
+      }
+    }
   },
   etherscan: {
     apiKey: {arbitrumGoerli: `${arb_scan_key}`},

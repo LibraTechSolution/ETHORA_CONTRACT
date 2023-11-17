@@ -12,11 +12,11 @@ contract MarketOIConfig is Ownable {
     constructor(
         uint256 maxMarketOI,
         uint256 maxTradeSize,
-        IBufferBinaryOptions marketContract
+        address marketContract
     ) {
         _maxMarketOI = maxMarketOI;
         _maxTradeSize = maxTradeSize;
-        _marketContract = marketContract;
+        _marketContract = IBufferBinaryOptions(marketContract);
     }
 
     function setMaxMarketOI(uint256 maxMarketOI) external onlyOwner {

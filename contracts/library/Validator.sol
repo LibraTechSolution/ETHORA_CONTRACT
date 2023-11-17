@@ -61,7 +61,7 @@ library Validator {
             keccak256(
                 abi.encode(
                     keccak256(
-                        "UserTradeSignature(address user,uint256 totalFee,uint256 period,address targetContract,uint256 strike,uint256 slippage,bool allowPartialFill,string referralCode,uint256 traderNFTId,uint256 timestamp)"
+                        "UserTradeSignature(address user,uint256 totalFee,uint256 period,address targetContract,uint256 strike,uint256 slippage,bool allowPartialFill,string referralCode,uint256 timestamp)"
                     ),
                     user,
                     params.totalFee,
@@ -71,7 +71,7 @@ library Validator {
                     params.slippage,
                     params.allowPartialFill,
                     keccak256(bytes(params.referralCode)),
-                    params.traderNFTId,
+                    // params.traderNFTId,
                     signInfo.timestamp
                 )
             );
@@ -86,7 +86,7 @@ library Validator {
             keccak256(
                 abi.encode(
                     keccak256(
-                        "UserTradeSignatureWithSettlementFee(address user,uint256 totalFee,uint256 period,address targetContract,uint256 strike,uint256 slippage,bool allowPartialFill,string referralCode,uint256 traderNFTId,uint256 timestamp,uint256 settlementFee)"
+                        "UserTradeSignatureWithSettlementFee(address user,uint256 totalFee,uint256 period,address targetContract,uint256 strike,uint256 slippage,bool allowPartialFill,string referralCode,uint256 timestamp,uint256 settlementFee)"
                     ),
                     user,
                     params.totalFee,
@@ -96,7 +96,7 @@ library Validator {
                     params.slippage,
                     params.allowPartialFill,
                     keccak256(bytes(params.referralCode)),
-                    params.traderNFTId,
+                    // params.traderNFTId,
                     signInfo.timestamp,
                     params.settlementFee
                 )
@@ -181,7 +181,7 @@ library Validator {
             keccak256(
                 abi.encode(
                     keccak256(
-                        "MarketDirectionSignatureWithSettlementFee(address user,uint256 totalFee,uint256 period,address targetContract,uint256 strike,uint256 slippage,bool allowPartialFill,string referralCode,uint256 traderNFTId,bool isAbove,uint256 timestamp,uint256 settlementFee)"
+                        "MarketDirectionSignatureWithSettlementFee(address user,uint256 totalFee,uint256 period,address targetContract,uint256 strike,uint256 slippage,bool allowPartialFill,string referralCode,bool isAbove,uint256 timestamp,uint256 settlementFee)"
                     ),
                     queuedTrade.user,
                     queuedTrade.totalFee,
@@ -191,7 +191,7 @@ library Validator {
                     queuedTrade.slippage,
                     queuedTrade.allowPartialFill,
                     keccak256(bytes(queuedTrade.referralCode)),
-                    queuedTrade.traderNFTId,
+                    // queuedTrade.traderNFTId,
                     params.isAbove,
                     signInfo.timestamp,
                     queuedTrade.settlementFee
@@ -208,7 +208,7 @@ library Validator {
             keccak256(
                 abi.encode(
                     keccak256(
-                        "MarketDirectionSignature(address user,uint256 totalFee,uint256 period,address targetContract,uint256 strike,uint256 slippage,bool allowPartialFill,string referralCode,uint256 traderNFTId,bool isAbove,uint256 timestamp)"
+                        "MarketDirectionSignature(address user,uint256 totalFee,uint256 period,address targetContract,uint256 strike,uint256 slippage,bool allowPartialFill,string referralCode,bool isAbove,uint256 timestamp)"
                     ),
                     queuedTrade.user,
                     queuedTrade.totalFee,
@@ -218,7 +218,7 @@ library Validator {
                     queuedTrade.slippage,
                     queuedTrade.allowPartialFill,
                     keccak256(bytes(queuedTrade.referralCode)),
-                    queuedTrade.traderNFTId,
+                    // queuedTrade.traderNFTId,
                     params.isAbove,
                     signInfo.timestamp
                 )

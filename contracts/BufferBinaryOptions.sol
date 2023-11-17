@@ -2,10 +2,10 @@
 
 pragma solidity ^0.8.4;
 
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 // import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "./interfaces/interfaces.sol";
 import "./library/OptionMath.sol";
 
@@ -17,15 +17,15 @@ import "./library/OptionMath.sol";
 
 contract BufferBinaryOptions is
     IBufferBinaryOptions,
-    ReentrancyGuard,
+    ReentrancyGuardUpgradeable,
     // ERC721,
-    AccessControl
+    AccessControlUpgradeable
 {
-    using SafeERC20 for ERC20;
-    uint256 public nextTokenId = 0;
+    using SafeERC20Upgradeable for ERC20Upgradeable; 
+    uint256 public nextTokenId;
     uint256 public totalMarketOI;
     bool public isPaused;
-    uint16 public stepSize = 25; // Factor of 1e2
+    uint16 public stepSize; // Factor of 1e2
     string public override token0;
     string public override token1;
 
@@ -33,25 +33,32 @@ contract BufferBinaryOptions is
     IOptionsConfig public override config;
     IReferralStorage public referral;
     AssetCategory public assetCategory;
-    ERC20 public override tokenX;
+    ERC20Upgradeable public override tokenX;
 
     mapping(uint256 => Option) public override options;
     mapping(address => uint256[]) public userOptionIds;
     mapping(address => bool) public approvedAddresses;
     mapping(uint256 => address) public override optionOwners; 
-    bytes32 public constant ROUTER_ROLE = keccak256("ROUTER_ROLE");
-    bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
+    bytes32 public ROUTER_ROLE;
+    bytes32 public PAUSER_ROLE;
 
-    // constructor() ERC721("Buffer", "BFR") {
+    // constructor() {
     //     _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     // }
+
+    function initialize() external initializer {
+        stepSize = 25;
+        ROUTER_ROLE = keccak256("ROUTER_ROLE");
+        PAUSER_ROLE = keccak256("PAUSER_ROLE");
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+    }
 
     /************************************************
      *  INITIALIZATION FUNCTIONS
      ***********************************************/
 
-    function initialize(
-        ERC20 _tokenX,
+    function ownerConfig(
+        address _tokenX,
         ILiquidityPool _pool,
         IOptionsConfig _config,
         IReferralStorage _referral,
@@ -59,26 +66,22 @@ contract BufferBinaryOptions is
         string memory _token0,
         string memory _token1
     ) external onlyRole(DEFAULT_ADMIN_ROLE) {
-        if (address(tokenX) == address(0)) {
-            tokenX = _tokenX;
-            pool = _pool;
-            config = _config;
-            referral = _referral;
-            assetCategory = _category;
-            token0 = _token0;
-            token1 = _token1;
-            _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-            emit CreateOptionsContract(
-                address(config),
-                address(pool),
-                address(tokenX),
-                token0,
-                token1,
-                assetCategory
-            );
-        } else {
-            revert("Already initialized");
-        }
+        tokenX = ERC20Upgradeable(_tokenX);
+        pool = _pool;
+        config = _config;
+        referral = _referral;
+        assetCategory = _category;
+        token0 = _token0;
+        token1 = _token1;
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        emit CreateOptionsContract(
+            address(config),
+            address(pool),
+            address(tokenX),
+            token0,
+            token1,
+            assetCategory
+        );
     }
 
     function assetPair() external view override returns (string memory) {
@@ -126,7 +129,7 @@ contract BufferBinaryOptions is
             optionParams.amount / 2,
             queuedTime + optionParams.period,
             optionParams.totalFee,
-            queuedTime
+            queuedTime           
         );
         optionID = _generateTokenId();
         userOptionIds[optionParams.user].push(optionID);
@@ -502,6 +505,14 @@ contract BufferBinaryOptions is
         approvedAddresses[addressToApprove] = true;
     }
 
+    function setToken(
+        string memory token0_,
+        string memory token1_
+    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        token0 = token0_;
+        token1 = token1_;
+    }
+
     // function _beforeTokenTransfer(address from, address to, uint256 firstTokenId, uint256 batchSize) internal virtual override {
     //     if (
     //         from != address(0) &&
@@ -512,4 +523,6 @@ contract BufferBinaryOptions is
     //         revert("Token transfer not allowed");
     //     }
     // }
+
+    uint256[47] private __gap;
 }

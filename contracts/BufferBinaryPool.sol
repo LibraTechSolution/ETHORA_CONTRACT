@@ -3,9 +3,9 @@
 pragma solidity ^0.8.4;
 
 import "./interfaces/interfaces.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 
 /**
  * @author Heisenberg
@@ -13,30 +13,33 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
  * @notice Accumulates liquidity in TokenX from LPs and distributes P&L in TokenX
  */
 contract BufferBinaryPool is
-    ERC20("Buffer LP Token", "BLP"),
-    AccessControl,
+    ERC20Upgradeable,
+    AccessControlUpgradeable,
     ILiquidityPool
 {
-    using SafeERC20 for ERC20;
-    ERC20 public tokenX;
-    uint16 public constant ACCURACY = 1e3;
-    uint32 public constant INITIAL_RATE = 1;
+    using SafeERC20Upgradeable for ERC20Upgradeable;
+    ERC20Upgradeable public tokenX;
+    uint16 public ACCURACY;
+    uint32 public INITIAL_RATE;
     uint32 public lockupPeriod;
     uint256 public lockedAmount;
     uint256 public lockedPremium;
     uint256 public maxLiquidity;
     address public owner;
-    bytes32 public constant OPTION_ISSUER_ROLE =
-        keccak256("OPTION_ISSUER_ROLE");
+    bytes32 public OPTION_ISSUER_ROLE;
 
     mapping(address => LockedLiquidity[]) public lockedLiquidity;
     mapping(address => bool) public isHandler;
     mapping(address => ProvidedLiquidity) public liquidityPerUser;
 
-    constructor(ERC20 _tokenX, uint32 _lockupPeriod) {
-        tokenX = _tokenX;
+    function initialize(address _tokenX, uint32 _lockupPeriod) external initializer{
+        __ERC20_init("Buffer LP Token", "BLP");
+        ACCURACY = 1e3;
+        INITIAL_RATE = 1;
+        OPTION_ISSUER_ROLE = keccak256("OPTION_ISSUER_ROLE");
+        tokenX = ERC20Upgradeable(_tokenX);
         owner = msg.sender;
-        maxLiquidity = 5000000 * 10**_tokenX.decimals();
+        maxLiquidity = 5000000 * 10**tokenX.decimals();
         lockupPeriod = _lockupPeriod;
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
@@ -53,6 +56,20 @@ contract BufferBinaryPool is
         onlyRole(DEFAULT_ADMIN_ROLE)
     {
         isHandler[_handler] = _isActive;
+    }
+
+    function setTokenX(address token_) 
+        external
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        tokenX = ERC20Upgradeable(token_);
+    }
+
+    function setLockupPeriod(uint32 period_) 
+        external
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        lockupPeriod = period_;
     }
 
     /**
@@ -418,4 +435,6 @@ contract BufferBinaryPool is
         if (a % b != 0) c = c + 1;
         return c;
     }
+    
+    uint256[47] private __gap;
 }

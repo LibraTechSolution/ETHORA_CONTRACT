@@ -8,9 +8,9 @@ contract PoolOIConfig is Ownable {
     uint256 public _maxPoolOI;
     IPoolOIStorage public _poolOIStorage;
 
-    constructor(uint256 maxPoolOI, IPoolOIStorage poolOIStorage) {
+    constructor(uint256 maxPoolOI, address poolOIStorage) {
         _maxPoolOI = maxPoolOI;
-        _poolOIStorage = poolOIStorage;
+        _poolOIStorage = IPoolOIStorage(poolOIStorage);
     }
 
     function setMaxPoolOI(uint256 maxPoolOI) external onlyOwner {

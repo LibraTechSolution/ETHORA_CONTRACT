@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 
 pragma solidity ^0.8.4;
 
@@ -76,7 +76,7 @@ interface IBufferRouter {
         uint256 slippage;
         bool allowPartialFill;
         string referralCode;
-        uint256 traderNFTId;
+        // uint256 traderNFTId;
         uint256 settlementFee;
         bool isLimitOrder;
         bool isTradeResolved;
@@ -104,7 +104,7 @@ interface IBufferRouter {
         uint256 slippage;
         bool allowPartialFill;
         string referralCode;
-        uint256 traderNFTId;
+        // uint256 traderNFTId;
         uint256 price;
         uint256 settlementFee;
         bool isLimitOrder;
@@ -169,8 +169,13 @@ interface IBufferRouter {
         address indexed account,
         uint256 queueId,
         uint256 optionId,
-        address targetContract
+        address targetContract,
+        uint256 expiration,
+        uint256 revisedFee
     );
+
+    function tradeds(address) external view returns (bool);
+
     event CancelTrade(address indexed account, uint256 queueId, string reason);
     event FailUnlock(uint256 optionId, address targetContract, string reason);
     event FailResolve(uint256 queueId, string reason);
@@ -237,7 +242,7 @@ interface IBufferBinaryOptions {
         uint256 slippage
     ) external returns (uint256 amount, uint256 revisedFee);
 
-    function tokenX() external view returns (ERC20);
+    function tokenX() external view returns (ERC20Upgradeable);
 
     function pool() external view returns (ILiquidityPool);
 

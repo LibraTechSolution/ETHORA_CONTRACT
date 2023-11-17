@@ -11,6 +11,7 @@ import "./interfaces/interfaces.sol";
  * @notice Contains referral Logic for option buying
  */
 contract ReferralStorage is IReferralStorage, Ownable {
+    IBufferRouter public router;
     mapping(address => uint8) public override referrerTier; // link between user <> tier
     mapping(uint8 => Tier) public tiers;
     mapping(uint8 => uint8) public override referrerTierStep;
@@ -20,6 +21,14 @@ contract ReferralStorage is IReferralStorage, Ownable {
     mapping(address => string) public override traderReferralCodes;
     mapping(address => ReferralData) public UserReferralData;
     mapping(address => bool) public operators;
+
+    constructor(address router_) {
+        router = IBufferRouter(router_);
+    }
+
+    function setRouter(address router_) external onlyOwner {
+        router = IBufferRouter(router_);
+    }
 
     /**
      * @notice Sets the config for step reduction and discount on the basis of tier
@@ -119,7 +128,8 @@ contract ReferralStorage is IReferralStorage, Ownable {
      ***********************************************/
 
     function _setTraderReferralCode(address user, string memory _code) private {
-        require(bytes(traderReferralCodes[user]).length == 0, "created code");
+        require(!router.tradeds(user), "traded");
+        require(codeOwner[_code] != address(0), "code not exist");
         traderReferralCodes[user] = _code;
         emit UpdateTraderReferralCode(user, _code);
     }

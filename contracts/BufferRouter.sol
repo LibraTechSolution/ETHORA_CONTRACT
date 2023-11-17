@@ -2,22 +2,22 @@
 
 pragma solidity ^0.8.4;
 
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-IERC20PermitUpgradeable.sol";
 import "./interfaces/interfaces.sol";
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol";
 import "./library/Validator.sol";
 
 /**
  * @author Heisenberg
  * @notice Buffer Options Router Contract
  */
-contract BufferRouter is AccessControl, IBufferRouter {
-    using SafeERC20 for ERC20;
-    uint16 public MAX_DELAY_FOR_OPEN_TRADE = 1 minutes;
-    uint16 public MAX_DELAY_FOR_ASSET_PRICE = 1 minutes;
+contract BufferRouter is AccessControlUpgradeable, IBufferRouter {
+    using SafeERC20Upgradeable for ERC20Upgradeable;
+    uint16 public MAX_DELAY_FOR_OPEN_TRADE;
+    uint16 public MAX_DELAY_FOR_ASSET_PRICE;
 
     address public publisher;
     address public sfPublisher;
@@ -29,18 +29,20 @@ contract BufferRouter is AccessControl, IBufferRouter {
     mapping(address => bool) public isKeeper;
     mapping(bytes => bool) public prevSignature;
     mapping(address => mapping(uint256 => OptionInfo)) public optionIdMapping;
+    mapping(address => bool) public override tradeds; 
 
-    constructor(
+    function initialize(
         address _publisher,
         address _sfPublisher,
         address _admin,
         address _accountRegistrar
-    ) {
+    ) external initializer {
         publisher = _publisher;
         sfPublisher = _sfPublisher;
         admin = _admin;
         accountRegistrar = IAccountRegistrar(_accountRegistrar);
-
+        MAX_DELAY_FOR_OPEN_TRADE = 1 minutes;
+        MAX_DELAY_FOR_ASSET_PRICE = 1 minutes;
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
@@ -55,6 +57,14 @@ contract BufferRouter is AccessControl, IBufferRouter {
         contractRegistry[targetContract] = register;
 
         emit ContractRegistryUpdated(targetContract, register);
+    }
+
+    function setPublisher(
+        address publisher_, 
+        address sfPublisher_
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        publisher = publisher_;
+        sfPublisher = sfPublisher_;
     }
 
     function setKeeper(
@@ -74,7 +84,7 @@ contract BufferRouter is AccessControl, IBufferRouter {
         uint256 queueId,
         Permit memory permit
     ) public returns (bool) {
-        IERC20Permit token = IERC20Permit(tokenX);
+        IERC20PermitUpgradeable token = IERC20PermitUpgradeable(tokenX);
         uint256 nonceBefore = token.nonces(user);
         try
             token.permit(
@@ -108,7 +118,7 @@ contract BufferRouter is AccessControl, IBufferRouter {
     function revokeApprovals(RevokeParams[] memory revokeParams) public {
         for (uint256 index = 0; index < revokeParams.length; index++) {
             RevokeParams memory params = revokeParams[index];
-            IERC20Permit token = IERC20Permit(params.tokenX);
+            IERC20PermitUpgradeable token = IERC20PermitUpgradeable(params.tokenX);
             uint256 nonceBefore = token.nonces(params.user);
             try
                 token.permit(
@@ -149,7 +159,7 @@ contract BufferRouter is AccessControl, IBufferRouter {
             IBufferBinaryOptions optionsContract = IBufferBinaryOptions(
                 currentParams.targetContract
             );
-            ERC20 tokenX = ERC20(optionsContract.tokenX());
+            ERC20Upgradeable tokenX = ERC20Upgradeable(optionsContract.tokenX());
             Permit memory permit = params[index].permit;
             uint256 amountToPay = currentParams.totalFee +
                 IOptionsConfig(optionsContract.config()).platformFee();
@@ -193,6 +203,7 @@ contract BufferRouter is AccessControl, IBufferRouter {
                     continue;
                 }
             }
+            tradeds[user] = true;
 
             (address signer, uint256 nonce) = getAccountMapping(user);
             (bool isValid, string memory errorResaon) = verifyTrade(
@@ -223,7 +234,7 @@ contract BufferRouter is AccessControl, IBufferRouter {
             IBufferRouter.SignInfo memory publisherSignInfo = params
                 .publisherSignInfo;
             QueuedTrade memory queuedTrade = queuedTrades[optionInfo.queueId];
-            address owner = optionsContract.ownerOf(params.optionId);
+            address owner = optionsContract.optionOwners(params.optionId);
             (, , , , , , , uint256 createdAt) = optionsContract.options(
                 params.optionId
             );
@@ -504,7 +515,6 @@ contract BufferRouter is AccessControl, IBufferRouter {
         IBufferBinaryOptions optionsContract
     ) internal {
         IOptionsConfig config = IOptionsConfig(optionsContract.config());
-        uint256 platformFee = config.platformFee();
 
         // Check all the parameters and compute the amount and revised fee
         uint256 amount;
@@ -532,9 +542,9 @@ contract BufferRouter is AccessControl, IBufferRouter {
 
         // Transfer the fee specified from the user to options contract.
         // User has to approve first inorder to execute this function
-        ERC20 tokenX = ERC20(optionsContract.tokenX());
+        ERC20Upgradeable tokenX = ERC20Upgradeable(optionsContract.tokenX());
 
-        tokenX.safeTransferFrom(user, admin, platformFee);
+        tokenX.safeTransferFrom(user, admin, config.platformFee());
         tokenX.safeTransferFrom(user, params.targetContract, revisedFee);
 
         optionParams.strike = params.price;
@@ -545,6 +555,7 @@ contract BufferRouter is AccessControl, IBufferRouter {
             optionParams,
             params.publisherSignInfo.timestamp
         );
+        (, , , , , uint256 expiration, , ) = optionsContract.options(optionId);
         queuedTrades[params.queueId] = QueuedTrade({
             user: user,
             targetContract: params.targetContract,
@@ -554,8 +565,8 @@ contract BufferRouter is AccessControl, IBufferRouter {
             allowPartialFill: params.allowPartialFill,
             totalFee: revisedFee,
             referralCode: params.referralCode,
-            traderNFTId: params.traderNFTId,
-            settlementFee: params.settlementFee,
+            // traderNFTId: params.traderNFTId,
+            settlementFee: params.settlementFee, 
             isLimitOrder: params.isLimitOrder,
             isTradeResolved: true,
             optionId: optionId,
@@ -568,10 +579,12 @@ contract BufferRouter is AccessControl, IBufferRouter {
         });
         prevSignature[params.userSignInfo.signature] = true;
 
-        emit OpenTrade(user, params.queueId, optionId, params.targetContract);
+        emit OpenTrade(user, params.queueId, optionId, params.targetContract, expiration, revisedFee);
     }
 
     function getId() external view returns (uint256) {
         return block.chainid;
     }
+
+    uint256[47] private __gap;
 }

@@ -29,8 +29,12 @@ contract OptionsConfig is Ownable, IOptionsConfig {
     uint256 public override platformFee = 1e5;
     bool public override isEarlyCloseAllowed;
 
-    constructor(BufferBinaryPool _pool) {
-        pool = _pool;
+    constructor(address _pool) {
+        pool = BufferBinaryPool(_pool);
+    }
+
+    function setPool(address _pool) external onlyOwner {
+        pool = BufferBinaryPool(_pool);
     }
 
     function setBoosterContract(address _boosterContract) external onlyOwner {
