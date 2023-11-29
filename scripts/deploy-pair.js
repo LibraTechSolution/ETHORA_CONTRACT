@@ -9,8 +9,8 @@ async function main() {
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  let Token = await ethers.getContractFactory("Token");
-  let token = await Token.attach("0x3F3c63dF6E0571d7bBd8e628A9988C3d3d8234d3")
+  let Token = await ethers.getContractFactory("USDC");
+  let token = await Token.attach("0x406E0ffa0D7675bb0AF77A319fA34F13B762B0b7")
 //   let token = await upgrades.deployProxy(Token, ["USDC", "USDC"], {
 //     initializer: "initialize",
 //   });
@@ -31,8 +31,8 @@ async function main() {
 //   await registrar.deployed();
 //   console.log("Registrar address:", registrar.address);
 
-  let Router = await ethers.getContractFactory('BufferRouter')
-  let router = await Router.attach("0xd2BDcd234872416C3b3d4Ec82CC30782AF30cd60")
+  let Router = await ethers.getContractFactory('EthoraRouter')
+  let router = await Router.attach("0x18634a7D67D408BB20c50d7e4485dA3BB7737DdC")
 //   let router = await upgrades.deployProxy(Router, [
 //     process.env.OPERATOR,
 //     process.env.OPERATOR,
@@ -40,33 +40,33 @@ async function main() {
 //     registrar.address
 //   ], {initializer: "initialize"})
 //   await router.deployed();
-//   console.log("BufferRouter address:", router.address);
+//   console.log("EthoraRouter address:", router.address);
 
 //   let Ref = await ethers.getContractFactory('ReferralStorage')
 //   let ref = await Ref.deploy(router.address)
 //   await ref.deployed();
 //   console.log("ReferralStorage address:", ref.address);
 
-  let Option = await ethers.getContractFactory('BufferBinaryOptions')
-  let option = await Option.attach("0x25ffe1A6BB755C9A4bDA91aC2B0aDb98A85F85d2")
-//   let option = await upgrades.deployProxy(Option, [], {initializer: "initialize"})
-//   await option.deployed();
-//   console.log("BufferBinaryOptions address:", option.address);
+  let Option = await ethers.getContractFactory('EthoraBinaryOptions')
+  // let option = await Option.attach("0x25ffe1A6BB755C9A4bDA91aC2B0aDb98A85F85d2")
+  let option = await upgrades.deployProxy(Option, [], {initializer: "initialize"})
+  await option.deployed();
+  console.log("EthoraBinaryOptions address:", option.address);
 
-  let Pool = await ethers.getContractFactory('BufferBinaryPool')
-  let pool = await Pool.attach("0x55a53148cEc4D466cc743546Bd2D0714e6801D4c")
+  let Pool = await ethers.getContractFactory('EthoraBinaryPool')
+  let pool = await Pool.attach("0xE1751c304c28d46E3D6582D10F427C40d60eAB7C")
 //   let pool = await upgrades.deployProxy(Pool, [
 //     token.address,
 //     86400
 //   ], {initializer: "initialize"})
 //   await pool.deployed();
-//   console.log("BufferBinaryPool address:", pool.address);
+//   console.log("EthoraBinaryPool address:", pool.address);
 
   let Ocg = await ethers.getContractFactory('OptionsConfig')
-  let ocg = await Ocg.attach("0x9B689852C790812D303e80b489009f8e5AbBd01b")
-//   let ocg = await Ocg.deploy(pool.address)
-//   await ocg.deployed();
-//   console.log("OptionsConfig address:", ocg.address);
+  // let ocg = await Ocg.attach("0x9B689852C790812D303e80b489009f8e5AbBd01b")
+  let ocg = await Ocg.deploy(pool.address)
+  await ocg.deployed();
+  console.log("OptionsConfig address:", ocg.address);
 
 //   let Osg = await ethers.getContractFactory('OptionStorage')
 //   let osg = await Osg.deploy()
@@ -74,7 +74,7 @@ async function main() {
 //   console.log("OptionStorage address:", osg.address);
 
   let POIS = await ethers.getContractFactory('PoolOIStorage')
-  let pois = await POIS.attach("0x1ff8E4fcA841ef8c56C2cCD816A54C4346233B6d")
+  let pois = await POIS.attach("0x06b19380cf91503E768a4C280Bbb3d96Ee9626Ad")
 //   let pois = await POIS.deploy()
 //   await pois.deployed();
 //   console.log("PoolOIStorage address:", pois.address);
@@ -88,14 +88,14 @@ async function main() {
 //   console.log("PoolOIConfig address:", poic.address);
 
   let MOIC = await ethers.getContractFactory('MarketOIConfig')
-  let moic = await MOIC.attach("0xC176e511EC9a9eCe7D2aa885F7b7f5B19D209939")
-//   let moic = await MOIC.deploy(
-//     ethers.BigNumber.from("10000000000"),
-//     ethers.BigNumber.from("1000000000"),
-//     option.address
-//   )
-//   await moic.deployed();
-//   console.log("MarketOIConfig address:", moic.address);
+  // let moic = await MOIC.attach("0xC176e511EC9a9eCe7D2aa885F7b7f5B19D209939")
+  let moic = await MOIC.deploy(
+    ethers.BigNumber.from("10000000000"),
+    ethers.BigNumber.from("1000000000"),
+    option.address
+  )
+  await moic.deployed();
+  console.log("MarketOIConfig address:", moic.address);
 
 //   let Booster = await ethers.getContractFactory('Booster')
 //   let booster = await upgrades.deployProxy(Booster, [], {initializer: "initialize"})
@@ -104,65 +104,73 @@ async function main() {
 
 //   await booster.setBoostPercentage(0)
   
-//   await option.ownerConfig(
-//     token.address,
-//     pool.address,
-//     ocg.address,
-//     "0x8A34e11E73c2C1A7F97db4f1e960ED8aC4a4B004",
-//     1,
-//     'XAG',
-//     'USD'
-//   );
-//   console.log(1);
-//   await sleep(4000);
+  await option.ownerConfig(
+    token.address,
+    pool.address,
+    ocg.address,
+    "0x7F8b31185f8a2C6B73CCA4210784232f06493f1C",
+    1,
+    'XAG',
+    'USD'
+  );
+  console.log(1);
+  await sleep(4000);
 
-//   await ocg.setBoosterContract("0xAe0Db8CA270d2fd6a9D1e2D304eE2915E910da4E");
-//   console.log(2);
-//   await sleep(4000);
+  await ocg.setBoosterContract("0xd53FCDb4210e5D9C65769b9cEe9A9dc6B27Adc95");
+  console.log(2);
+  await sleep(4000);
 
-//   await ocg.setMinFee(ethers.BigNumber.from("5000000"));
-//   console.log(3);
-//   await sleep(4000);
+  await ocg.setMinFee(ethers.BigNumber.from("5000000"));
+  console.log(3);
+  await sleep(4000);
 
-//   await ocg.setIV(1384);
-//   console.log(4);
-//   await sleep(4000);
+  await ocg.setIV(1384);
+  console.log(4);
+  await sleep(4000);
 
-//   await ocg.setPlatformFee(ethers.BigNumber.from("100000"));
-//   console.log(5);
-//   await sleep(4000);
+  await ocg.setPlatformFee(ethers.BigNumber.from("100000"));
+  console.log(5);
+  await sleep(4000);
 
-//   await ocg.setSettlementFeeDisbursalContract(deployer.address);
-//   console.log(6);
-//   await sleep(4000);
+  await ocg.setSettlementFeeDisbursalContract(deployer.address);
+  console.log(6);
+  await sleep(4000);
 
-//   await ocg.setOptionStorageContract("0x6230A557561A2b954D42EB5a6c52727c4896e690");
-//   console.log(7);
-//   await sleep(4000);
+  await ocg.setOptionStorageContract("0x12b539Df209C5b99635EB65610731b7dc99F32eb");
+  console.log(7);
+  await sleep(4000);
 
-//   await ocg.setMaxPeriod(14400);
-//   console.log(8);
-//   await sleep(4000);
+  await ocg.setMaxPeriod(14400);
+  console.log(8);
+  await sleep(4000);
 
-//   await ocg.setMinPeriod(180);
-//   console.log(9);
-//   await sleep(4000);
+  await ocg.setMinPeriod(180);
+  console.log(9);
+  await sleep(4000);
 
-//   await ocg.setPoolOIStorageContract(pois.address);
-//   console.log(10);
-//   await sleep(4000);
+  await ocg.setPoolOIStorageContract(pois.address);
+  console.log(10);
+  await sleep(4000);
 
-//   await ocg.setPoolOIConfigContract("0x9a672c867daCeE58B7B6214AB2d5E3c9e39977c3");
-//   console.log(11);
-//   await sleep(4000);
+  await ocg.setPoolOIConfigContract("0x1117542A1B22952Ed5552fc1F57F643953dE56f2");
+  console.log(11);
+  await sleep(4000);
 
-//   await ocg.setMarketOIConfigContract(moic.address);
-//   console.log(12);
-//   await sleep(4000);
+  await ocg.setMarketOIConfigContract(moic.address);
+  console.log(12);
+  await sleep(4000);
 
-//   await ocg.setEarlyCloseThreshold(60);
-//   console.log(13);
-//   await sleep(4000);
+  await ocg.setEarlyCloseThreshold(60);
+  console.log(13);
+  await sleep(4000);
+
+  await ocg.toggleEarlyClose();
+  console.log(14);
+  await sleep(4000);
+
+  await ocg.setCreationWindowContract("0x1776fe8f55ebDCa89BC7bEB745BEA947930D9594"); // @TODO truyền địa chỉ window
+  console.log(15);
+  await sleep(4000);
 
   await router.setContractRegistry(option.address, true);
   console.log(1);

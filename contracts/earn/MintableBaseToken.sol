@@ -5,7 +5,7 @@ pragma solidity ^0.8.4;
 import "./BaseToken.sol";
 import "./../interfaces/IMintable.sol";
 
-//bnBFR
+//bnETR
 
 contract MintableBaseToken is BaseToken, IMintable {
     mapping(address => bool) public override isMinter;

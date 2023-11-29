@@ -9,213 +9,213 @@ async function main() {
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  let BFR = await ethers.getContractFactory("Token");
-  let bfr = await upgrades.deployProxy(BFR, ["Buffer Token", "BFR"], {
+  let ETR = await ethers.getContractFactory("Token");
+  let etr = await upgrades.deployProxy(ETR, ["Ethora Token", "ETR"], {
     initializer: "initialize",
   });
-  await bfr.deployed();
-  console.log("Bfr address:", bfr.address);
+  await etr.deployed();
+  console.log("Etr address:", etr.address);
 
-  let BnBFR = await ethers.getContractFactory('MintableBaseToken')
-  let bnBfr = await BnBFR.deploy(
-    "Bonus BFR",
-    "bnBFR",
+  let BnETR = await ethers.getContractFactory('MintableBaseToken')
+  let bnEtr = await BnETR.deploy(
+    "Bonus ETR",
+    "bnETR",
     parseEther("10000000000000")
   )
-  await bnBfr.deployed();
-  console.log("bnBfr address:", bnBfr.address);
+  await bnEtr.deployed();
+  console.log("bnEtr address:", bnEtr.address);
 
-  let EsBFR = await ethers.getContractFactory('EsBFR')
-  let esBfr = await EsBFR.deploy()
-  await esBfr.deployed();
-  console.log("esBfr address:", esBfr.address);
+  let EsETR = await ethers.getContractFactory('EsETR')
+  let esEtr = await EsETR.deploy()
+  await esEtr.deployed();
+  console.log("esEtr address:", esEtr.address);
 
   // let Gov = await ethers.getContractFactory('Governable')
   // let gov = await Gov.deploy()
   // await gov.deployed();
   // console.log("gov address:", gov.address);
 
-  //stakedBFRTracker sBFR 
-  let SBFR = await ethers.getContractFactory('RewardTracker')
-  let sBFR = await SBFR.deploy(
-    "Staked BFR",
-    "sBFR"
+  //stakedETRTracker sETR 
+  let SETR = await ethers.getContractFactory('RewardTracker')
+  let sETR = await SETR.deploy(
+    "Staked ETR",
+    "sETR"
   )
-  await sBFR.deployed();
-  console.log("sBFR address:", sBFR.address);
+  await sETR.deployed();
+  console.log("sETR address:", sETR.address);
 
-  let SBFRDis = await ethers.getContractFactory('RewardDistributor')
-  let sBFRDis = await SBFRDis.deploy(
-    esBfr.address,
-    sBFR.address // sBFR
+  let SETRDis = await ethers.getContractFactory('RewardDistributor')
+  let sETRDis = await SETRDis.deploy(
+    esEtr.address,
+    sETR.address // sETR
   )
-  await sBFRDis.deployed();
-  console.log("sBFRDistributor address:", sBFRDis.address);
+  await sETRDis.deployed();
+  console.log("sETRDistributor address:", sETRDis.address);
 
-  //bonusBFRTracker sbBFR
-  let SbBFR = await ethers.getContractFactory('RewardTracker')
-  let sbBFR = await SbBFR.deploy(
-    "Staked + Bonus BFR",
-    "sbBFR"
+  //bonusETRTracker sbETR
+  let SbETR = await ethers.getContractFactory('RewardTracker')
+  let sbETR = await SbETR.deploy(
+    "Staked + Bonus ETR",
+    "sbETR"
   )
-  await sbBFR.deployed();
-  console.log("sbBFR address:", sbBFR.address);
+  await sbETR.deployed();
+  console.log("sbETR address:", sbETR.address);
 
-  let SbBFRDis = await ethers.getContractFactory('BonusDistributor')
-  let sbBFRDis = await SbBFRDis.deploy(
-    bnBfr.address,
-    sbBFR.address // sbBFR
+  let SbETRDis = await ethers.getContractFactory('BonusDistributor')
+  let sbETRDis = await SbETRDis.deploy(
+    bnEtr.address,
+    sbETR.address // sbETR
   )
-  await sbBFRDis.deployed();
-  console.log("sbBFRDistributor address:", sbBFRDis.address);
+  await sbETRDis.deployed();
+  console.log("sbETRDistributor address:", sbETRDis.address);
 
-  //feeBFRTracker sbfBFR
-  let SbfBFR = await ethers.getContractFactory('RewardTracker')
-  let sbfBFR = await SbfBFR.deploy(
-    "Staked + Bonus + Fee BFR",
-    "sbfBFR"
+  //feeETRTracker sbfETR
+  let SbfETR = await ethers.getContractFactory('RewardTracker')
+  let sbfETR = await SbfETR.deploy(
+    "Staked + Bonus + Fee ETR",
+    "sbfETR"
   )
-  await sbfBFR.deployed();
-  console.log("sbfBFR address:", sbfBFR.address);
+  await sbfETR.deployed();
+  console.log("sbfETR address:", sbfETR.address);
 
-  let SbfBFRDis = await ethers.getContractFactory('RewardDistributor')
-  let sbfBFRDis = await SbfBFRDis.deploy(
-    "0x3F3c63dF6E0571d7bBd8e628A9988C3d3d8234d3", // USDC
-    sbfBFR.address // sbfBFR
+  let SbfETRDis = await ethers.getContractFactory('RewardDistributor')
+  let sbfETRDis = await SbfETRDis.deploy(
+    "0x406E0ffa0D7675bb0AF77A319fA34F13B762B0b7", // USDC
+    sbfETR.address // sbfETR
   )
-  await sbfBFRDis.deployed();
-  console.log("sbfBFRDistributor address:", sbfBFRDis.address);
+  await sbfETRDis.deployed();
+  console.log("sbfETRDistributor address:", sbfETRDis.address);
 
-  //feeBLPTracker fBLP
-  let FBLP = await ethers.getContractFactory('RewardTracker')
-  let fBLP = await FBLP.deploy(
-    "Fee BLP",
-    "fBLP"
+  //feeELPTracker fELP
+  let FELP = await ethers.getContractFactory('RewardTracker')
+  let fELP = await FELP.deploy(
+    "Fee ELP",
+    "fELP"
   )
-  await fBLP.deployed();
-  console.log("fBLP address:", fBLP.address);
+  await fELP.deployed();
+  console.log("fELP address:", fELP.address);
 
-  let FBLPDis = await ethers.getContractFactory('RewardDistributor')
-  let fBLPDis = await FBLPDis.deploy(
-    "0x3F3c63dF6E0571d7bBd8e628A9988C3d3d8234d3", // USDC
-    fBLP.address // fBLP
+  let FELPDis = await ethers.getContractFactory('RewardDistributor')
+  let fELPDis = await FELPDis.deploy(
+    "0x406E0ffa0D7675bb0AF77A319fA34F13B762B0b7", // USDC
+    fELP.address // fELP
   )
-  await fBLPDis.deployed();
-  console.log("fBLPDistributor address:", fBLPDis.address);
+  await fELPDis.deployed();
+  console.log("fELPDistributor address:", fELPDis.address);
 
-  //stakedBLPTracker fsBLP
-  let FsBLP = await ethers.getContractFactory('RewardTracker')
-  let fsBLP = await FsBLP.deploy(
-    "Fee + Staked BLP",
-    "fsBLP"
+  //stakedELPTracker fsELP
+  let FsELP = await ethers.getContractFactory('RewardTracker')
+  let fsELP = await FsELP.deploy(
+    "Fee + Staked ELP",
+    "fsELP"
   )
-  await fsBLP.deployed();
-  console.log("fsBLP address:", fsBLP.address);
+  await fsELP.deployed();
+  console.log("fsELP address:", fsELP.address);
 
-  let FsBLPDis = await ethers.getContractFactory('RewardDistributor')
-  let fsBLPDis = await FsBLPDis.deploy(
-    esBfr.address, // esBFR
-    fsBLP.address // fBLP
+  let FsELPDis = await ethers.getContractFactory('RewardDistributor')
+  let fsELPDis = await FsELPDis.deploy(
+    esEtr.address, // esETR
+    fsELP.address // fELP
   )
-  await fsBLPDis.deployed();
-  console.log("fsBLPDistributor address:", fsBLPDis.address);
+  await fsELPDis.deployed();
+  console.log("fsELPDistributor address:", fsELPDis.address);
 
 
-  let BFRVester = await ethers.getContractFactory("Vester");
-  let bfrVester = await upgrades.deployProxy(BFRVester, [
-    "Vested BFR",
-    "vBFR",
+  let ETRVester = await ethers.getContractFactory("Vester");
+  let etrVester = await upgrades.deployProxy(ETRVester, [
+    "Vested ETR",
+    "vETR",
     31536000,
-    esBfr.address,
-    sbfBFR.address, // sbf bfr
-    bfr.address,
-    sBFR.address, //sBfr
+    esEtr.address,
+    sbfETR.address, // sbf etr
+    etr.address,
+    sETR.address, //sEtr
   ], {
     initializer: "initialize",
   });
-  await bfrVester.deployed();
-  console.log("bfrVester address:", bfrVester.address);
+  await etrVester.deployed();
+  console.log("etrVester address:", etrVester.address);
 
-  let BLPVester = await ethers.getContractFactory("Vester");
-  let blpVester = await upgrades.deployProxy(BLPVester, [
-    "Vested BLP",
-    "vBLP",
+  let ELPVester = await ethers.getContractFactory("Vester");
+  let elpVester = await upgrades.deployProxy(ELPVester, [
+    "Vested ELP",
+    "vELP",
     31536000,
-    esBfr.address,
-    fsBLP.address, // fsBLP
-    bfr.address,
-    fsBLP.address, //fsBLP
+    esEtr.address,
+    fsELP.address, // fsELP
+    etr.address,
+    fsELP.address, //fsELP
   ], {
     initializer: "initialize",
   });
-  await blpVester.deployed();
-  console.log("blpVester address:", blpVester.address);
+  await elpVester.deployed();
+  console.log("elpVester address:", elpVester.address);
 
-  let RouterV2 = await ethers.getContractFactory("RewardRouterV2");
-  let routerV2 = await upgrades.deployProxy(RouterV2, [
-    "0x3F3c63dF6E0571d7bBd8e628A9988C3d3d8234d3",
-    bfr.address,
-    esBfr.address,
-    bnBfr.address,
-    "0x55a53148cEc4D466cc743546Bd2D0714e6801D4c",
-    sBFR.address,
-    sbBFR.address,
-    sbfBFR.address,
-    fBLP.address,
-    fsBLP.address,
-    bfrVester.address,
-    blpVester.address
+  let Router = await ethers.getContractFactory("RewardRouter");
+  let router = await upgrades.deployProxy(Router, [
+    "0x406E0ffa0D7675bb0AF77A319fA34F13B762B0b7",
+    etr.address,
+    esEtr.address,
+    bnEtr.address,
+    "0xE1751c304c28d46E3D6582D10F427C40d60eAB7C",
+    sETR.address,
+    sbETR.address,
+    sbfETR.address,
+    fELP.address,
+    fsELP.address,
+    etrVester.address,
+    elpVester.address
   ], {
     initializer: "initialize",
   });
-  await routerV2.deployed();
-  console.log("RewardRouterV2 address:", routerV2.address);
+  await router.deployed();
+  console.log("RewardRouter address:", router.address);
 
   await sleep(4000);
 
-  await sBFR.initialize(
+  await sETR.initialize(
     [
-      bfr.address,
-      esBfr.address
+      etr.address,
+      esEtr.address
     ],
-    sBFRDis.address
+    sETRDis.address
   );
   console.log(1);
   await sleep(4000);
 
-  await sbBFR.initialize(
+  await sbETR.initialize(
     [
-      sBFR.address
+      sETR.address
     ],
-    sbBFRDis.address
+    sbETRDis.address
   );
   console.log(2);
   await sleep(4000);
 
-  await sbfBFR.initialize(
+  await sbfETR.initialize(
     [
-      sbBFR.address,
-      bnBfr.address
+      sbETR.address,
+      bnEtr.address
     ],
-    sbfBFRDis.address
+    sbfETRDis.address
   );
   console.log(3);
   await sleep(4000);
 
-  await fBLP.initialize(
+  await fELP.initialize(
     [
-      "0x55a53148cEc4D466cc743546Bd2D0714e6801D4c"
+      "0xE1751c304c28d46E3D6582D10F427C40d60eAB7C"
     ],
-    fBLPDis.address
+    fELPDis.address
   );
   console.log(4);
   await sleep(4000);
 
-  await fsBLP.initialize(
+  await fsELP.initialize(
     [
-      fBLP.address
+      fELP.address
     ],
-    fsBLPDis.address
+    fsELPDis.address
   );
   console.log(5);
   await sleep(4000);
@@ -223,64 +223,64 @@ async function main() {
   try {
     console.log("\nEtherscan verification in progress...");
     await hre.run("verify:verify", {
-      address: bnBfr.address,
+      address: bnEtr.address,
       constructorArguments: [
-        "Bonus BFR",
-        "bnBFR",
+        "Bonus ETR",
+        "bnETR",
         parseEther("10000000000000")
       ],
     });
-    console.log("bnBfr verification done.");
+    console.log("bnEtr verification done.");
     await sleep(4000);
 
     await hre.run("verify:verify", {
-      address: sBFR.address,
+      address: sETR.address,
       constructorArguments: [
-        "Staked BFR",
-        "sBFR"
+        "Staked ETR",
+        "sETR"
       ],
     });
-    console.log("sBfr verification done.");
+    console.log("sEtr verification done.");
     await sleep(4000);
 
     await hre.run("verify:verify", {
-      address: sbBFR.address,
+      address: sbETR.address,
       constructorArguments: [
-        "Staked + Bonus BFR",
-        "sbBFR"
+        "Staked + Bonus ETR",
+        "sbETR"
       ],
     });
-    console.log("sbBfr verification done.");
+    console.log("sbEtr verification done.");
     await sleep(4000);
 
     await hre.run("verify:verify", {
-      address: sbfBFR.address,
+      address: sbfETR.address,
       constructorArguments: [
-        "Staked + Bonus + Fee BFR",
-        "sbfBFR"
+        "Staked + Bonus + Fee ETR",
+        "sbfETR"
       ],
     });
-    console.log("sbfBfr verification done.");
+    console.log("sbfEtr verification done.");
     await sleep(4000);
 
     await hre.run("verify:verify", {
-      address: fBLP.address,
+      address: fELP.address,
       constructorArguments: [
-        "Fee BLP",
-        "fBLP"
+        "Fee ELP",
+        "fELP"
       ],
     });
-    console.log("fBLP verification done.");
+    console.log("fELP verification done.");
     await sleep(4000);
 
     await hre.run("verify:verify", {
-      address: fsBLP.address,
+      address: fsELP.address,
       constructorArguments: [
-        "Fee + Staked BLP",
-        "fsBLP"
+        "Fee + Staked ELP",
+        "fsELP"
       ],
     });
-    console.log("fsBLP verification done.");
+    console.log("fsELP verification done.");
     await sleep(4000);
 
   } catch (error) {

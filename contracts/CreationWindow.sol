@@ -19,7 +19,7 @@ contract CreationWindow {
     }
 
     function getWeekId(uint256 timestamp) public pure returns (uint256) {
-        return (timestamp - (3 * 86400) - (17 * 3600)) / 604800;
+        return (timestamp - (3 * 86400) - (20 * 3600)) / 604800;
     }
 
     function isInCreationWindow(uint256 period) external view returns (bool) {
@@ -36,15 +36,15 @@ contract CreationWindow {
             currentTime >= currentWeekStartTime && endTime < currentWeekEndTime
         ) {
             // check if trading is closed from 10PM to 11PM UTC daily
-            uint256 endHour = (endTime / 3600) % 24;
-            uint256 startHour = (currentTime / 3600) % 24;
-            if (
-                endHour == 22 ||
-                startHour == 22 ||
-                (endHour == 23 && period > 59 * 60)
-            ) {
-                return false;
-            }
+            // uint256 endHour = (endTime / 3600) % 24;
+            // uint256 startHour = (currentTime / 3600) % 24;
+            // if (
+            //     endHour == 22 ||
+            //     startHour == 22 ||
+            //     (endHour == 23 && period > 59 * 60)
+            // ) {
+            //     return false;
+            // }
             return true;
         }
         return false;

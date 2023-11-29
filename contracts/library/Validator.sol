@@ -53,9 +53,9 @@ library Validator {
     }
 
     function getUserTradeHash(
-        IBufferRouter.TradeParams memory params,
+        IEthoraRouter.TradeParams memory params,
         address user,
-        IBufferRouter.SignInfo memory signInfo
+        IEthoraRouter.SignInfo memory signInfo
     ) internal view returns (bytes32) {
         return
             keccak256(
@@ -78,9 +78,9 @@ library Validator {
     }
 
     function getUserTradeHashWithSF(
-        IBufferRouter.TradeParams memory params,
+        IEthoraRouter.TradeParams memory params,
         address user,
-        IBufferRouter.SignInfo memory signInfo
+        IEthoraRouter.SignInfo memory signInfo
     ) internal view returns (bytes32) {
         return
             keccak256(
@@ -104,11 +104,11 @@ library Validator {
     }
 
     function verifyUserTradeParams(
-        IBufferRouter.TradeParams memory params,
+        IEthoraRouter.TradeParams memory params,
         address user,
         address signer
     ) internal view returns (bool) {
-        IBufferRouter.SignInfo memory signInfo = params.userSignInfo;
+        IEthoraRouter.SignInfo memory signInfo = params.userSignInfo;
         bytes32 hashData;
         if (params.isLimitOrder) {
             hashData = getUserTradeHash(params, user, signInfo);
@@ -173,9 +173,9 @@ library Validator {
     }
 
     function getMarketDirectionHashWithSF(
-        IBufferRouter.CloseTradeParams memory params,
-        IBufferRouter.QueuedTrade memory queuedTrade,
-        IBufferRouter.SignInfo memory signInfo
+        IEthoraRouter.CloseTradeParams memory params,
+        IEthoraRouter.QueuedTrade memory queuedTrade,
+        IEthoraRouter.SignInfo memory signInfo
     ) internal view returns (bytes32) {
         return
             keccak256(
@@ -200,9 +200,9 @@ library Validator {
     }
 
     function getMarketDirectionHash(
-        IBufferRouter.CloseTradeParams memory params,
-        IBufferRouter.QueuedTrade memory queuedTrade,
-        IBufferRouter.SignInfo memory signInfo
+        IEthoraRouter.CloseTradeParams memory params,
+        IEthoraRouter.QueuedTrade memory queuedTrade,
+        IEthoraRouter.SignInfo memory signInfo
     ) internal view returns (bytes32) {
         return
             keccak256(
@@ -226,11 +226,11 @@ library Validator {
     }
 
     function verifyMarketDirection(
-        IBufferRouter.CloseTradeParams memory params,
-        IBufferRouter.QueuedTrade memory queuedTrade,
+        IEthoraRouter.CloseTradeParams memory params,
+        IEthoraRouter.QueuedTrade memory queuedTrade,
         address signer
     ) internal view returns (bool) {
-        IBufferRouter.SignInfo memory signInfo = params.marketDirectionSignInfo;
+        IEthoraRouter.SignInfo memory signInfo = params.marketDirectionSignInfo;
         bytes32 hashData;
         if (queuedTrade.isLimitOrder) {
             hashData = getMarketDirectionHash(params, queuedTrade, signInfo);

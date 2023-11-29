@@ -12,9 +12,9 @@ import "./library/Validator.sol";
 
 /**
  * @author Heisenberg
- * @notice Buffer Options Router Contract
+ * @notice Ethora Options Router Contract
  */
-contract BufferRouter is AccessControlUpgradeable, IBufferRouter {
+contract EthoraRouter is AccessControlUpgradeable, IEthoraRouter {
     using SafeERC20Upgradeable for ERC20Upgradeable;
     uint16 public MAX_DELAY_FOR_OPEN_TRADE;
     uint16 public MAX_DELAY_FOR_ASSET_PRICE;
@@ -65,6 +65,12 @@ contract BufferRouter is AccessControlUpgradeable, IBufferRouter {
     ) external onlyRole(DEFAULT_ADMIN_ROLE) {
         publisher = publisher_;
         sfPublisher = sfPublisher_;
+    }
+
+    function setAdmin(
+        address admin_
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        admin = admin_;
     }
 
     function setKeeper(
@@ -156,7 +162,7 @@ contract BufferRouter is AccessControlUpgradeable, IBufferRouter {
         for (uint32 index = 0; index < params.length; index++) {
             TradeParams memory currentParams = params[index].tradeParams;
             address user = params[index].user;
-            IBufferBinaryOptions optionsContract = IBufferBinaryOptions(
+            IEthoraBinaryOptions optionsContract = IEthoraBinaryOptions(
                 currentParams.targetContract
             );
             ERC20Upgradeable tokenX = ERC20Upgradeable(optionsContract.tokenX());
@@ -228,10 +234,10 @@ contract BufferRouter is AccessControlUpgradeable, IBufferRouter {
             OptionInfo memory optionInfo = optionIdMapping[
                 params.targetContract
             ][params.optionId];
-            IBufferBinaryOptions optionsContract = IBufferBinaryOptions(
+            IEthoraBinaryOptions optionsContract = IEthoraBinaryOptions(
                 params.targetContract
             );
-            IBufferRouter.SignInfo memory publisherSignInfo = params
+            IEthoraRouter.SignInfo memory publisherSignInfo = params
                 .publisherSignInfo;
             QueuedTrade memory queuedTrade = queuedTrades[optionInfo.queueId];
             address owner = optionsContract.optionOwners(params.optionId);
@@ -342,13 +348,13 @@ contract BufferRouter is AccessControlUpgradeable, IBufferRouter {
                 params.targetContract
             ][params.optionId];
 
-            IBufferBinaryOptions optionsContract = IBufferBinaryOptions(
+            IEthoraBinaryOptions optionsContract = IEthoraBinaryOptions(
                 params.targetContract
             );
             (, , , , , uint256 expiration, , ) = optionsContract.options(
                 params.optionId
             );
-            IBufferRouter.SignInfo memory signInfo = params.publisherSignInfo;
+            IEthoraRouter.SignInfo memory signInfo = params.publisherSignInfo;
 
             bool isSignerVerifed = Validator.verifyPublisher(
                 optionsContract.assetPair(),
@@ -434,7 +440,7 @@ contract BufferRouter is AccessControlUpgradeable, IBufferRouter {
         TradeParams memory params,
         address user,
         address tradeSigner,
-        IBufferBinaryOptions optionsContract
+        IEthoraBinaryOptions optionsContract
     ) public view returns (bool, string memory) {
         SignInfo memory settlementFeeSignInfo = params.settlementFeeSignInfo;
         SignInfo memory publisherSignInfo = params.publisherSignInfo;
@@ -512,15 +518,15 @@ contract BufferRouter is AccessControlUpgradeable, IBufferRouter {
         address user,
         address tradeSigner,
         uint256 nonce,
-        IBufferBinaryOptions optionsContract
+        IEthoraBinaryOptions optionsContract
     ) internal {
         IOptionsConfig config = IOptionsConfig(optionsContract.config());
 
         // Check all the parameters and compute the amount and revised fee
         uint256 amount;
         uint256 revisedFee;
-        IBufferBinaryOptions.OptionParams
-            memory optionParams = IBufferBinaryOptions.OptionParams(
+        IEthoraBinaryOptions.OptionParams
+            memory optionParams = IEthoraBinaryOptions.OptionParams(
                 params.strike,
                 0,
                 params.period,

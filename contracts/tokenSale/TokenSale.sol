@@ -24,7 +24,7 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, PausableUpgradeabl
     address public BEAGLE_FACTORY;
 
     // Max times (for sanity checks)
-    uint256 public MAX_BUFFER_TIMES;
+    uint256 public MAX_ETHORA_TIMES;
 
     // The LP token used
     IERC20Upgradeable public raiseToken;
@@ -146,7 +146,7 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, PausableUpgradeabl
      * @param _offeringToken: the token that is offered for the Token sale
      * @param _startTime: the start time for the Token sale
      * @param _endTime: the end time for the Token sale
-     * @param _maxBufferTimes: maximum buffer of times from the current block timestamp
+     * @param _maxEthoraTimes: maximum Ethora of times from the current block timestamp
      * @param _adminAddress: the admin address for handling tokens
      */
     function initSale(
@@ -154,7 +154,7 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, PausableUpgradeabl
         address _offeringToken,
         uint256 _startTime,
         uint256 _endTime,
-        uint256 _maxBufferTimes,
+        uint256 _maxEthoraTimes,
         address _adminAddress
     ) public {
         require(!isInitialized, "Operations: Already initialized");
@@ -167,7 +167,7 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, PausableUpgradeabl
         offeringToken = IERC20Upgradeable(_offeringToken);
         startTime = _startTime;
         endTime = _endTime;
-        MAX_BUFFER_TIMES = _maxBufferTimes;
+        MAX_ETHORA_TIMES = _maxEthoraTimes;
 
         // Transfer ownership to admin
         transferOwnership(_adminAddress);
@@ -419,7 +419,7 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, PausableUpgradeabl
      * @dev This function is only callable by admin.
      */
     function updateStartAndEndTimes(uint256 _startTime, uint256 _endTime) external onlyOwner {
-        require(_endTime < (block.timestamp + MAX_BUFFER_TIMES), "Operations: EndTime too far");
+        require(_endTime < (block.timestamp + MAX_ETHORA_TIMES), "Operations: EndTime too far");
         require(block.timestamp < startTime, "Operations: Token sale has started");
         require(_startTime < _endTime, "Operations: New startTime must be lower than new endTime");
         require(block.timestamp < _startTime, "Operations: New startTime must be higher than current timestamp");
@@ -903,6 +903,11 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, PausableUpgradeabl
 
     function _isQualifiedWhitelist(address _user) internal view returns (bool) {
         return isWhitelisted(_user);
+    }
+
+    function setToken(address raiseToken_, address offeringToken_) external onlyOwner {
+        raiseToken = IERC20Upgradeable(raiseToken_);
+        offeringToken = IERC20Upgradeable(offeringToken_);
     }
 
     function pause() external onlyOwner {

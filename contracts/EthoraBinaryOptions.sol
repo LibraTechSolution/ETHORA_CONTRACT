@@ -11,12 +11,12 @@ import "./library/OptionMath.sol";
 
 /**
  * @author Heisenberg
- * @title Buffer Options
+ * @title Ethora Options
  * @notice Creates ERC721 Options
  */
 
-contract BufferBinaryOptions is
-    IBufferBinaryOptions,
+contract EthoraBinaryOptions is
+    IEthoraBinaryOptions,
     ReentrancyGuardUpgradeable,
     // ERC721,
     AccessControlUpgradeable
@@ -41,6 +41,9 @@ contract BufferBinaryOptions is
     mapping(uint256 => address) public override optionOwners; 
     bytes32 public ROUTER_ROLE;
     bytes32 public PAUSER_ROLE;
+    bytes32 public IV_ROLE;
+    uint256 public ivFactorITM;
+    uint256 public ivFactorOTM;
 
     // constructor() {
     //     _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -56,6 +59,20 @@ contract BufferBinaryOptions is
     /************************************************
      *  INITIALIZATION FUNCTIONS
      ***********************************************/
+    
+    function setIvConfig(
+        uint256 ivFactorITM_, 
+        uint256 ivFactorOTM_
+    ) external onlyRole(IV_ROLE) {
+        ivFactorITM = ivFactorITM_;
+        ivFactorOTM = ivFactorOTM_;
+    }
+
+    function initIV() external onlyRole(DEFAULT_ADMIN_ROLE) {
+        IV_ROLE =  keccak256("ROUTER_ROLE");
+        ivFactorITM = 1e3;
+        ivFactorOTM = 50;
+    }
 
     function ownerConfig(
         address _tokenX,
@@ -346,7 +363,7 @@ contract BufferBinaryOptions is
     //     public
     //     view
     //     virtual
-    //     override(ERC721, IBufferBinaryOptions)
+    //     override(ERC721, IEthoraBinaryOptions)
     //     returns (address)
     // {
     //     return super.ownerOf(tokenId);
@@ -373,6 +390,39 @@ contract BufferBinaryOptions is
         settlementFee = total - premium;
     }
 
+    function test(
+        uint256 optionID,
+        uint256 closingPrice,
+        uint256 closingTime,
+        bool isAbove
+    ) external view returns(
+        uint256 bs, 
+        uint256 profit, 
+        uint256 lpProfit, 
+        uint256 lpLoss
+    ) {
+        Option storage option = options[optionID];
+        if (option.expiration > closingTime) {
+            bs = OptionMath.blackScholesPriceBinary(
+                config.iv(),
+                option.strike,
+                closingPrice,
+                option.expiration - closingTime,
+                true,
+                isAbove
+            );
+            profit =
+                (option.lockedAmount * bs) / 1e8;
+        } else {
+            profit = option.lockedAmount;
+        }
+        if (profit <= option.premium) {
+            lpProfit = option.premium - profit;
+        } else {
+            lpLoss = profit - option.premium;
+        }
+    }
+
     /**
      * @notice Exercises the ITM options
      */
@@ -385,10 +435,17 @@ contract BufferBinaryOptions is
         Option storage option = options[optionID];
         address user = optionOwners[optionID];
         if (option.expiration > closingTime) {
+            bool isITM;
+            if (
+                (isAbove && option.strike < closingPrice) ||
+                (!isAbove && option.strike > closingPrice)
+            ) {
+                isITM = true;
+            }
             profit =
                 (option.lockedAmount *
                     OptionMath.blackScholesPriceBinary(
-                        config.iv(),
+                        getFactoredIv(isITM),
                         option.strike,
                         closingPrice,
                         option.expiration - closingTime,
@@ -480,6 +537,11 @@ contract BufferBinaryOptions is
         referralDiscount = (stepSize * maxStep);
     }
 
+    function getFactoredIv(bool isITM) public view returns (uint256) {
+        uint256 iv = config.iv();
+        return isITM ? (iv * ivFactorITM) / 100 : (iv * ivFactorOTM) / 100;
+    }
+
     /**
      * @notice Returns the discounted settlement fee
      */
@@ -524,5 +586,5 @@ contract BufferBinaryOptions is
     //     }
     // }
 
-    uint256[47] private __gap;
+    uint256[44] private __gap;
 }

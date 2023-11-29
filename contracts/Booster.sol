@@ -10,7 +10,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-IERC20P
 
 /**
  * @author Heisenberg
- * @notice Buffer Options Router Contract
+ * @notice Ethora Options Router Contract
  */
 contract Booster is OwnableUpgradeable, IBooster, AccessControlUpgradeable {
     using SafeERC20Upgradeable for ERC20Upgradeable;

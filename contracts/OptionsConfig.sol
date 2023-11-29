@@ -2,16 +2,16 @@ pragma solidity ^0.8.4;
 
 // SPDX-License-Identifier: BUSL-1.1
 
-import "./BufferBinaryPool.sol";
+import "./EthoraBinaryPool.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @author Heisenberg
- * @title Buffer Options Config
+ * @title Ethora Options Config
  * @notice Maintains all the configurations for the options contracts
  */
 contract OptionsConfig is Ownable, IOptionsConfig {
-    BufferBinaryPool public pool;
+    EthoraBinaryPool public pool;
 
     address public override settlementFeeDisbursalContract;
     address public override optionStorageContract;
@@ -30,11 +30,11 @@ contract OptionsConfig is Ownable, IOptionsConfig {
     bool public override isEarlyCloseAllowed;
 
     constructor(address _pool) {
-        pool = BufferBinaryPool(_pool);
+        pool = EthoraBinaryPool(_pool);
     }
 
     function setPool(address _pool) external onlyOwner {
-        pool = BufferBinaryPool(_pool);
+        pool = EthoraBinaryPool(_pool);
     }
 
     function setBoosterContract(address _boosterContract) external onlyOwner {

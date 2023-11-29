@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.4;
 
-interface IBlpManager {
+interface IElpManager {
     function provideForAccount(
         uint256 tokenXAmount,
         uint256 minMint,

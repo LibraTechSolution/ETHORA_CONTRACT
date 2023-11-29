@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 
 /**
  * @author Heisenberg
- * @notice Buffer Options Router Contract
+ * @notice Ethora Options Router Contract
  */
 contract AccountRegistrar is IAccountRegistrar, AccessControl {
     mapping(address => AccountMapping) public override accountMapping;

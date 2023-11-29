@@ -66,7 +66,7 @@ interface IAccountRegistrar {
     ) external;
 }
 
-interface IBufferRouter {
+interface IEthoraRouter {
     struct QueuedTrade {
         address user;
         uint256 totalFee;
@@ -197,7 +197,7 @@ interface IBufferRouter {
     );
 }
 
-interface IBufferBinaryOptions {
+interface IEthoraBinaryOptions {
     event Create(
         address indexed account,
         uint256 indexed id,

@@ -9,10 +9,10 @@ import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 
 /**
  * @author Heisenberg
- * @title Buffer TokenX Liquidity Pool
+ * @title Ethora TokenX Liquidity Pool
  * @notice Accumulates liquidity in TokenX from LPs and distributes P&L in TokenX
  */
-contract BufferBinaryPool is
+contract EthoraBinaryPool is
     ERC20Upgradeable,
     AccessControlUpgradeable,
     ILiquidityPool
@@ -33,7 +33,7 @@ contract BufferBinaryPool is
     mapping(address => ProvidedLiquidity) public liquidityPerUser;
 
     function initialize(address _tokenX, uint32 _lockupPeriod) external initializer{
-        __ERC20_init("Buffer LP Token", "BLP");
+        __ERC20_init("Ethora LP Token", "ELP");
         ACCURACY = 1e3;
         INITIAL_RATE = 1;
         OPTION_ISSUER_ROLE = keccak256("OPTION_ISSUER_ROLE");
@@ -117,7 +117,7 @@ contract BufferBinaryPool is
     }
 
     /**
-     * @notice A provider supplies tokenX to the pool and receives BLP tokens
+     * @notice A provider supplies tokenX to the pool and receives ELP tokens
      * @param minMint Minimum amount of tokens that should be received by a provider.
                       Calling the provide function will require the minimum amount of tokens to be minted.
                       The actual amount that will be minted could vary but can only be higher (not lower) than the minimum value.
@@ -142,14 +142,14 @@ contract BufferBinaryPool is
     }
 
     /**
-     * @notice Burns BLP and receives X from the pool
+     * @notice Burns ELP and receives X from the pool
      */
     function withdraw(uint256 tokenXAmount) external {
         _withdraw(tokenXAmount, msg.sender);
     }
 
     /**
-     * @notice Called by the Handler to burns BLP and receives X for a user
+     * @notice Called by the Handler to burns ELP and receives X for a user
      */
     function withdrawForAccount(uint256 tokenXAmount, address account)
         external
@@ -164,7 +164,7 @@ contract BufferBinaryPool is
      ***********************************************/
 
     /**
-     * @notice Called by BufferBinaryOptions to lock the funds
+     * @notice Called by EthoraBinaryOptions to lock the funds
      * @param id optionId
      * @param tokenXAmount Amount of funds that should be locked in an option
      * @param premium Premium paid to liquidity pool to lock the above funds
@@ -190,7 +190,7 @@ contract BufferBinaryPool is
     }
 
     /**
-     * @notice Called by BufferOptions to unlock the funds
+     * @notice Called by EthoraOptions to unlock the funds
      * @param id Id of LockedLiquidity that should be unlocked
      */
     function unlock(uint256 id) external override onlyRole(OPTION_ISSUER_ROLE) {
@@ -200,7 +200,7 @@ contract BufferBinaryPool is
     }
 
     /**
-     * @notice Called by BufferBinaryOptions to send funds to liquidity providers after an option's expiration
+     * @notice Called by EthoraBinaryOptions to send funds to liquidity providers after an option's expiration
      * @param id Id of LockedLiquidity
      * @param to Provider
      * @param tokenXAmount Funds that should be sent
@@ -379,7 +379,7 @@ contract BufferBinaryPool is
     }
 
     /**
-     * @dev Converts BLP to tokenX.
+     * @dev Converts ELP to tokenX.
      */
     function toTokenX(uint256 amount) public view returns (uint256) {
         uint256 totalSupply = totalSupply();

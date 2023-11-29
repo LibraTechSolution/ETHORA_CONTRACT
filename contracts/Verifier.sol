@@ -7,7 +7,7 @@ import "./library/Validator.sol";
 contract Verifier {
     // validator
     function verifyUserTradeParams(
-        IBufferRouter.TradeParams memory params,
+        IEthoraRouter.TradeParams memory params,
         address user,
         address signer
     ) external view returns (bool) {
@@ -45,8 +45,8 @@ contract Verifier {
     }
 
     function verifyMarketDirection(
-        IBufferRouter.CloseTradeParams memory params,
-        IBufferRouter.QueuedTrade memory queuedTrade,
+        IEthoraRouter.CloseTradeParams memory params,
+        IEthoraRouter.QueuedTrade memory queuedTrade,
         address signer
     ) external view returns (bool) {
         return Validator.verifyMarketDirection(params, queuedTrade, signer);
@@ -82,33 +82,33 @@ contract Verifier {
     }
 
     function getUserTradeHash(
-        IBufferRouter.TradeParams memory params,
+        IEthoraRouter.TradeParams memory params,
         address user,
-        IBufferRouter.SignInfo memory signInfo
+        IEthoraRouter.SignInfo memory signInfo
     ) external view returns (bytes32) {
         return Validator.getUserTradeHash(params, user, signInfo);
     }
 
     function getUserTradeHashWithSF(
-        IBufferRouter.TradeParams memory params,
+        IEthoraRouter.TradeParams memory params,
         address user,
-        IBufferRouter.SignInfo memory signInfo
+        IEthoraRouter.SignInfo memory signInfo
     ) external view returns (bytes32) {
         return Validator.getUserTradeHashWithSF(params, user, signInfo);
     }
 
     function getMarketDirectionHashWithSF(
-        IBufferRouter.CloseTradeParams memory params,
-        IBufferRouter.QueuedTrade memory queuedTrade,
-        IBufferRouter.SignInfo memory signInfo
+        IEthoraRouter.CloseTradeParams memory params,
+        IEthoraRouter.QueuedTrade memory queuedTrade,
+        IEthoraRouter.SignInfo memory signInfo
     ) external view returns (bytes32) {
         return Validator.getMarketDirectionHashWithSF(params, queuedTrade, signInfo);
     }
 
     function getMarketDirectionHash(
-        IBufferRouter.CloseTradeParams memory params,
-        IBufferRouter.QueuedTrade memory queuedTrade,
-        IBufferRouter.SignInfo memory signInfo
+        IEthoraRouter.CloseTradeParams memory params,
+        IEthoraRouter.QueuedTrade memory queuedTrade,
+        IEthoraRouter.SignInfo memory signInfo
     ) external view returns (bytes32) {
         return Validator.getMarketDirectionHash(params, queuedTrade, signInfo);
     }

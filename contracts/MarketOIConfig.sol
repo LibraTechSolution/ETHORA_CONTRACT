@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract MarketOIConfig is Ownable {
     uint256 public _maxMarketOI;
     uint256 public _maxTradeSize;
-    IBufferBinaryOptions public _marketContract;
+    IEthoraBinaryOptions public _marketContract;
 
     constructor(
         uint256 maxMarketOI,
@@ -16,7 +16,7 @@ contract MarketOIConfig is Ownable {
     ) {
         _maxMarketOI = maxMarketOI;
         _maxTradeSize = maxTradeSize;
-        _marketContract = IBufferBinaryOptions(marketContract);
+        _marketContract = IEthoraBinaryOptions(marketContract);
     }
 
     function setMaxMarketOI(uint256 maxMarketOI) external onlyOwner {

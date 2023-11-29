@@ -11,7 +11,7 @@ import "./interfaces/interfaces.sol";
  * @notice Contains referral Logic for option buying
  */
 contract ReferralStorage is IReferralStorage, Ownable {
-    IBufferRouter public router;
+    IEthoraRouter public router;
     mapping(address => uint8) public override referrerTier; // link between user <> tier
     mapping(uint8 => Tier) public tiers;
     mapping(uint8 => uint8) public override referrerTierStep;
@@ -23,11 +23,11 @@ contract ReferralStorage is IReferralStorage, Ownable {
     mapping(address => bool) public operators;
 
     constructor(address router_) {
-        router = IBufferRouter(router_);
+        router = IEthoraRouter(router_);
     }
 
     function setRouter(address router_) external onlyOwner {
-        router = IBufferRouter(router_);
+        router = IEthoraRouter(router_);
     }
 
     /**

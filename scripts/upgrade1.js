@@ -5,8 +5,8 @@ async function main() {
   
     console.log("Account balance 123:", (await deployer.getBalance()).toString());
 
-    const Item = await ethers.getContractFactory("BufferRouter");
-    const item = await upgrades.upgradeProxy('0xd2BDcd234872416C3b3d4Ec82CC30782AF30cd60', Item);
+    const Item = await ethers.getContractFactory("EthoraBinaryOptions");
+    const item = await upgrades.upgradeProxy('0x9c4C031A88F3ddd9D29cD9C8e6513a3988964D9b', Item);
     console.log("Item upgraded");
 
   }

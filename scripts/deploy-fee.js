@@ -9,22 +9,29 @@ async function main() {
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  let TokenSale = await ethers.getContractFactory("TokenSale");
-  let ts = await upgrades.deployProxy(TokenSale, [], {
+  let Fee = await ethers.getContractFactory("SettlementFeeDistributor");
+  let fee = await upgrades.deployProxy(Fee, [
+    "0x406E0ffa0D7675bb0AF77A319fA34F13B762B0b7"
+  ], {
     initializer: "initialize",
   });
-  await ts.deployed();
-  console.log("TokenSale address:", ts.address);
+  await fee.deployed();
+  console.log("SettlementFeeDistributor address:", fee.address);
 
-  await ts.initSale(
-    "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
-    "0x128FD4d4Fa3930176c8155b12c16c58a20feCf60",
-    1702339200,
-    1702857600,
-    604800,
-    process.env.DEV
+  await fee.setShareHolderDetails(
+    [
+      "0x2818Ece980Ef660126075E71608F8337BD95A69b",
+      "0x1A4fe9A6534Ad24081f5A1626D8158B96920e0D0",
+      "0xc9Be5A7DFc35492C9aA6EE8bF018bF2BFa8E3119"
+    ],
+    [
+        6500,
+        2500,
+        1000
+    ]
   );
   console.log(1);
+  await sleep(4000);
 
 }
 

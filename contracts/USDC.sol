@@ -8,7 +8,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20PermitUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
-contract Token is ERC20Upgradeable, ERC20PermitUpgradeable, AccessControlUpgradeable {
+contract USDC is ERC20Upgradeable, ERC20PermitUpgradeable, AccessControlUpgradeable {
     function initialize (string memory name_, string memory symbol_) external initializer {
         __ERC20_init(name_, symbol_);
         __ERC20Permit_init(name_);

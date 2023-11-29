@@ -9,22 +9,10 @@ async function main() {
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  let TokenSale = await ethers.getContractFactory("TokenSale");
-  let ts = await upgrades.deployProxy(TokenSale, [], {
-    initializer: "initialize",
-  });
-  await ts.deployed();
-  console.log("TokenSale address:", ts.address);
-
-  await ts.initSale(
-    "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
-    "0x128FD4d4Fa3930176c8155b12c16c58a20feCf60",
-    1702339200,
-    1702857600,
-    604800,
-    process.env.DEV
-  );
-  console.log(1);
+  let WETH = await ethers.getContractFactory("WETH9");
+  let weth = await WETH.deploy();
+  await weth.deployed();
+  console.log("WETH address:", weth.address);
 
 }
 
