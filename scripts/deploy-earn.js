@@ -80,7 +80,7 @@ async function main() {
 
   let SbfETRDis = await ethers.getContractFactory('RewardDistributor')
   let sbfETRDis = await SbfETRDis.deploy(
-    "0x406E0ffa0D7675bb0AF77A319fA34F13B762B0b7", // USDC
+    "0x9d7d7DeF83de0e040E919991Db92cE4226956cf5", // USDC
     sbfETR.address // sbfETR
   )
   await sbfETRDis.deployed();
@@ -97,7 +97,7 @@ async function main() {
 
   let FELPDis = await ethers.getContractFactory('RewardDistributor')
   let fELPDis = await FELPDis.deploy(
-    "0x406E0ffa0D7675bb0AF77A319fA34F13B762B0b7", // USDC
+    "0x9d7d7DeF83de0e040E919991Db92cE4226956cf5", // USDC
     fELP.address // fELP
   )
   await fELPDis.deployed();
@@ -153,11 +153,11 @@ async function main() {
 
   let Router = await ethers.getContractFactory("RewardRouter");
   let router = await upgrades.deployProxy(Router, [
-    "0x406E0ffa0D7675bb0AF77A319fA34F13B762B0b7",
+    "0x9d7d7DeF83de0e040E919991Db92cE4226956cf5",
     etr.address,
     esEtr.address,
     bnEtr.address,
-    "0xE1751c304c28d46E3D6582D10F427C40d60eAB7C",
+    "0x3344495EFDf239E9A68818a29b2d54993FB17570",
     sETR.address,
     sbETR.address,
     sbfETR.address,
@@ -171,6 +171,30 @@ async function main() {
   await router.deployed();
   console.log("RewardRouter address:", router.address);
 
+  let Fee = await ethers.getContractFactory("SettlementFeeDistributor");
+  let fee = await upgrades.deployProxy(Fee, [
+    "0x9d7d7DeF83de0e040E919991Db92cE4226956cf5" //USDC
+  ], {
+    initializer: "initialize",
+  });
+  await fee.deployed();
+  console.log("SettlementFeeDistributor address:", fee.address);
+
+  await sleep(4000);
+
+  await fee.setShareHolderDetails(
+    [
+      fELPDis.address,
+      sbfETRDis.address,
+      "0xc9Be5A7DFc35492C9aA6EE8bF018bF2BFa8E3119"
+    ],
+    [
+        6500,
+        2500,
+        1000
+    ]
+  );
+  console.log(1);
   await sleep(4000);
 
   await sETR.initialize(
@@ -204,7 +228,7 @@ async function main() {
 
   await fELP.initialize(
     [
-      "0xE1751c304c28d46E3D6582D10F427C40d60eAB7C"
+      "0x3344495EFDf239E9A68818a29b2d54993FB17570"
     ],
     fELPDis.address
   );

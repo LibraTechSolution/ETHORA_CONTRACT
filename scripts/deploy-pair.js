@@ -168,9 +168,9 @@ async function main() {
   console.log(14);
   await sleep(4000);
 
-  await ocg.setCreationWindowContract("0x1776fe8f55ebDCa89BC7bEB745BEA947930D9594"); // @TODO truyền địa chỉ window
-  console.log(15);
-  await sleep(4000);
+  // await ocg.setCreationWindowContract("0x1776fe8f55ebDCa89BC7bEB745BEA947930D9594"); // @TODO truyền địa chỉ window
+  // console.log(15);
+  // await sleep(4000);
 
   await router.setContractRegistry(option.address, true);
   console.log(1);

@@ -53,6 +53,9 @@ contract EthoraBinaryOptions is
         stepSize = 25;
         ROUTER_ROLE = keccak256("ROUTER_ROLE");
         PAUSER_ROLE = keccak256("PAUSER_ROLE");
+        IV_ROLE =  keccak256("ROUTER_ROLE");
+        ivFactorITM = 1e3;
+        ivFactorOTM = 50;
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
@@ -66,12 +69,6 @@ contract EthoraBinaryOptions is
     ) external onlyRole(IV_ROLE) {
         ivFactorITM = ivFactorITM_;
         ivFactorOTM = ivFactorOTM_;
-    }
-
-    function initIV() external onlyRole(DEFAULT_ADMIN_ROLE) {
-        IV_ROLE =  keccak256("ROUTER_ROLE");
-        ivFactorITM = 1e3;
-        ivFactorOTM = 50;
     }
 
     function ownerConfig(
@@ -390,39 +387,6 @@ contract EthoraBinaryOptions is
         settlementFee = total - premium;
     }
 
-    function test(
-        uint256 optionID,
-        uint256 closingPrice,
-        uint256 closingTime,
-        bool isAbove
-    ) external view returns(
-        uint256 bs, 
-        uint256 profit, 
-        uint256 lpProfit, 
-        uint256 lpLoss
-    ) {
-        Option storage option = options[optionID];
-        if (option.expiration > closingTime) {
-            bs = OptionMath.blackScholesPriceBinary(
-                config.iv(),
-                option.strike,
-                closingPrice,
-                option.expiration - closingTime,
-                true,
-                isAbove
-            );
-            profit =
-                (option.lockedAmount * bs) / 1e8;
-        } else {
-            profit = option.lockedAmount;
-        }
-        if (profit <= option.premium) {
-            lpProfit = option.premium - profit;
-        } else {
-            lpLoss = profit - option.premium;
-        }
-    }
-
     /**
      * @notice Exercises the ITM options
      */
@@ -586,5 +550,5 @@ contract EthoraBinaryOptions is
     //     }
     // }
 
-    uint256[44] private __gap;
+    uint256[47] private __gap;
 }
