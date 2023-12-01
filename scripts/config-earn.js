@@ -10,37 +10,37 @@ async function main() {
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
   let SETR = await ethers.getContractFactory('RewardTracker')
-  let sETR = await SETR.attach("0xf117c60B9A023BAEC75c1A1b3a65EB384dC62639");
+  let sETR = await SETR.attach("0xb0bEd494FD3297432aE2Da7713e8E3B0879Ecf01");
 
   let SbETR = await ethers.getContractFactory('RewardTracker')
-  let sbETR = await SbETR.attach("0xe9062C6E0fef1B95C790D91225dC074edA8AA6a1")
+  let sbETR = await SbETR.attach("0x1c141446C2972F6DAb6Fe4f2B062844C54A9Bc4d")
 
   let SbfETR = await ethers.getContractFactory('RewardTracker')
-  let sbfETR = await SbfETR.attach("0x839e0818e5Ab0ce1d679B4ae7b5A6a41168B87aF")
+  let sbfETR = await SbfETR.attach("0x3382c6f891eB27E4E6B244De4a7c640a85D0D417")
 
   let FELP = await ethers.getContractFactory('RewardTracker')
-  let fELP = await FELP.attach("0x3c4965973D363f57CfD00fBeBc229ABc0Cd8F3dA")
+  let fELP = await FELP.attach("0x3e2019d52F85197241D985529e33C29c48F93855")
 
   let FsELP = await ethers.getContractFactory('RewardTracker')
-  let fsELP = await FsELP.attach("0xd2379D27281933F721c4A8a6b1277843e2c176aB")
+  let fsELP = await FsELP.attach("0x3af29a14db4eA470565f433E2092a3e6E8142058")
 
   let BnETR = await ethers.getContractFactory('MintableBaseToken')
-  let bnETR = await BnETR.attach("0x0F2f3c303Ce3Be69F30Ef757bDA7F14a38BEE7F7")
+  let bnETR = await BnETR.attach("0xa91e6160614266c062CB9929A46e819c37774ac9")
 
   let EsETR = await ethers.getContractFactory('EsETR')
-  let esETR = await EsETR.attach("0x7Fd1A7DfBF63865bd01f3Aef615Ce3c803D750C0");
+  let esETR = await EsETR.attach("0xDC60Bb738Fd647c2C3704CB4Ba8F7de3B2B097AA");
 
   let Router = await ethers.getContractFactory('RewardRouter')
-  let router = await Router.attach("0xEE2516fec6c8a888b39e3039D93bcADdFCC455b4");
+  let router = await Router.attach("0x433C3B35ACCb0BF4df9EC92C2FD92D391ddBe899");
 
   let ELP = await ethers.getContractFactory('EthoraBinaryPool')
-  let elp = await ELP.attach("0xE1751c304c28d46E3D6582D10F427C40d60eAB7C");
+  let elp = await ELP.attach("0xb935Dcb88cae8dc4C016E4Bcd2f6115192ae4009");
 
   let ETRVester = await ethers.getContractFactory('Vester')
-  let etrVester = await ETRVester.attach("0xE19b3Fccd4d9cD7a2436d1451CD3154345b77D66")
+  let etrVester = await ETRVester.attach("0x514CA5c7788D997007Ce4d53Fb555E542eDa7694")
 
   let ELPVester = await ethers.getContractFactory('Vester')
-  let elpVester = await ELPVester.attach("0xfe23BaD1323A8CA03C6876e646E24f80BcAEb172")
+  let elpVester = await ELPVester.attach("0x28f1be8968D136e76a67A72e4866a5FA556f85f0")
 
   await sETR.setHandler(
     router.address, // RRV2

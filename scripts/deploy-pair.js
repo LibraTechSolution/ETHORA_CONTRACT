@@ -10,7 +10,7 @@ async function main() {
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
   let Token = await ethers.getContractFactory("USDC");
-  let token = await Token.attach("0x406E0ffa0D7675bb0AF77A319fA34F13B762B0b7")
+  let token = await Token.attach("0xA3f66f2EeEe48d4420B7815EBF61216666311B33")
 //   let token = await upgrades.deployProxy(Token, ["USDC", "USDC"], {
 //     initializer: "initialize",
 //   });
@@ -32,7 +32,7 @@ async function main() {
 //   console.log("Registrar address:", registrar.address);
 
   let Router = await ethers.getContractFactory('EthoraRouter')
-  let router = await Router.attach("0x18634a7D67D408BB20c50d7e4485dA3BB7737DdC")
+  let router = await Router.attach("0xE298Ce7B470b695fc7646a02A9Ad1b4019df16f7")
 //   let router = await upgrades.deployProxy(Router, [
 //     process.env.OPERATOR,
 //     process.env.OPERATOR,
@@ -54,7 +54,7 @@ async function main() {
   console.log("EthoraBinaryOptions address:", option.address);
 
   let Pool = await ethers.getContractFactory('EthoraBinaryPool')
-  let pool = await Pool.attach("0xE1751c304c28d46E3D6582D10F427C40d60eAB7C")
+  let pool = await Pool.attach("0xb935Dcb88cae8dc4C016E4Bcd2f6115192ae4009")
 //   let pool = await upgrades.deployProxy(Pool, [
 //     token.address,
 //     86400
@@ -74,7 +74,7 @@ async function main() {
 //   console.log("OptionStorage address:", osg.address);
 
   let POIS = await ethers.getContractFactory('PoolOIStorage')
-  let pois = await POIS.attach("0x06b19380cf91503E768a4C280Bbb3d96Ee9626Ad")
+  let pois = await POIS.attach("0x8F804E6a6d3050C223A27c4Be63F3b81eb1293d5")
 //   let pois = await POIS.deploy()
 //   await pois.deployed();
 //   console.log("PoolOIStorage address:", pois.address);
@@ -108,7 +108,7 @@ async function main() {
     token.address,
     pool.address,
     ocg.address,
-    "0x7F8b31185f8a2C6B73CCA4210784232f06493f1C",
+    "0x8E550f9EFB90e745542FcFa810C032cB575EA8dB",
     1,
     'XAG',
     'USD'
@@ -116,7 +116,7 @@ async function main() {
   console.log(1);
   await sleep(4000);
 
-  await ocg.setBoosterContract("0xd53FCDb4210e5D9C65769b9cEe9A9dc6B27Adc95");
+  await ocg.setBoosterContract("0x8A34e11E73c2C1A7F97db4f1e960ED8aC4a4B004");
   console.log(2);
   await sleep(4000);
 
@@ -132,11 +132,11 @@ async function main() {
   console.log(5);
   await sleep(4000);
 
-  await ocg.setSettlementFeeDisbursalContract(deployer.address);
+  await ocg.setSettlementFeeDisbursalContract("0x771BEC2Da006C1f2D1FcFBA4BDF8981B16e206c1");
   console.log(6);
   await sleep(4000);
 
-  await ocg.setOptionStorageContract("0x12b539Df209C5b99635EB65610731b7dc99F32eb");
+  await ocg.setOptionStorageContract("0xBb5d868b294541538b622D5744ff69F6368a0456");
   console.log(7);
   await sleep(4000);
 
@@ -152,7 +152,7 @@ async function main() {
   console.log(10);
   await sleep(4000);
 
-  await ocg.setPoolOIConfigContract("0x1117542A1B22952Ed5552fc1F57F643953dE56f2");
+  await ocg.setPoolOIConfigContract("0xE0f1642806C9Ac1374C5ce55d0024c5946dCaF05");
   console.log(11);
   await sleep(4000);
 
@@ -168,9 +168,9 @@ async function main() {
   console.log(14);
   await sleep(4000);
 
-  // await ocg.setCreationWindowContract("0x1776fe8f55ebDCa89BC7bEB745BEA947930D9594"); // @TODO truyền địa chỉ window
-  // console.log(15);
-  // await sleep(4000);
+  await ocg.setCreationWindowContract("0x3d5Dbdf29833Ebd5E32F55B243AFB9eDe9A583b3"); // @TODO truyền địa chỉ window
+  console.log(15);
+  await sleep(4000);
 
   await router.setContractRegistry(option.address, true);
   console.log(1);
@@ -201,8 +201,8 @@ async function main() {
   console.log(17);
   await sleep(4000);
 
-  await token.transfer(option.address, ethers.utils.parseUnits("100000", 6));
-  console.log(18);
+  // await token.transfer(option.address, ethers.utils.parseUnits("100000", 6));
+  // console.log(18);
 }
 
 main()

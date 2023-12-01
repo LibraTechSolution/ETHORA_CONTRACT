@@ -17,12 +17,12 @@ async function main() {
   console.log("TokenSale address:", ts.address);
 
   await ts.initSale(
-    "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
-    "0x128FD4d4Fa3930176c8155b12c16c58a20feCf60",
+    "0x205cf2ECE09BF8681c2fa0F6e117f18088567cA1",
+    "0x652D76De559326dAd75ae9BEC711CdFC05111f9f",
     1702339200,
     1702857600,
     604800,
-    process.env.DEV
+    deployer.address
   );
   console.log(1);
 

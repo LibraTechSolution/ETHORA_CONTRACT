@@ -6,7 +6,7 @@ require("@openzeppelin/hardhat-upgrades");
 require('dotenv').config()
 
 const mnemonic = process.env.PRIVATE_KEY;
-const arb_scan_key = process.env.ARB_SCAN_KEY;
+const arb_scan_key = process.env.BASE_SCAN_KEY;
 const INFURA = process.env.INFURA;
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -70,6 +70,13 @@ module.exports = {
       blockGasLimit: 15000000,
       timeout: 20000,
     },
+    base: {
+      url: "https://goerli.base.org",
+      chainId: 84531	,
+      gasPrice: 1000000000,
+      accounts: [mnemonic],
+      gasLimit: 200000,
+    },
   },
   solidity: {
     compilers: [
@@ -124,6 +131,18 @@ module.exports = {
     }
   },
   etherscan: {
-    apiKey: {arbitrumGoerli: `${arb_scan_key}`},
+    apiKey: {
+      base: `${arb_scan_key}`
+    },
+    customChains: [
+      {
+        network: "base",
+        chainId: 84531,
+        urls: {
+         apiURL: "https://api-goerli.basescan.org/api",
+         browserURL: "https://goerli.basescan.org"
+        }
+      }
+    ]
   },
 };

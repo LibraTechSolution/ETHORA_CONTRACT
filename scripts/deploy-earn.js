@@ -80,7 +80,7 @@ async function main() {
 
   let SbfETRDis = await ethers.getContractFactory('RewardDistributor')
   let sbfETRDis = await SbfETRDis.deploy(
-    "0x9d7d7DeF83de0e040E919991Db92cE4226956cf5", // USDC
+    "0xA3f66f2EeEe48d4420B7815EBF61216666311B33", // USDC
     sbfETR.address // sbfETR
   )
   await sbfETRDis.deployed();
@@ -97,7 +97,7 @@ async function main() {
 
   let FELPDis = await ethers.getContractFactory('RewardDistributor')
   let fELPDis = await FELPDis.deploy(
-    "0x9d7d7DeF83de0e040E919991Db92cE4226956cf5", // USDC
+    "0xA3f66f2EeEe48d4420B7815EBF61216666311B33", // USDC
     fELP.address // fELP
   )
   await fELPDis.deployed();
@@ -153,11 +153,11 @@ async function main() {
 
   let Router = await ethers.getContractFactory("RewardRouter");
   let router = await upgrades.deployProxy(Router, [
-    "0x9d7d7DeF83de0e040E919991Db92cE4226956cf5",
+    "0xA3f66f2EeEe48d4420B7815EBF61216666311B33",
     etr.address,
     esEtr.address,
     bnEtr.address,
-    "0x3344495EFDf239E9A68818a29b2d54993FB17570",
+    "0xb935Dcb88cae8dc4C016E4Bcd2f6115192ae4009",
     sETR.address,
     sbETR.address,
     sbfETR.address,
@@ -173,7 +173,7 @@ async function main() {
 
   let Fee = await ethers.getContractFactory("SettlementFeeDistributor");
   let fee = await upgrades.deployProxy(Fee, [
-    "0x9d7d7DeF83de0e040E919991Db92cE4226956cf5" //USDC
+    "0xA3f66f2EeEe48d4420B7815EBF61216666311B33" //USDC
   ], {
     initializer: "initialize",
   });
@@ -228,7 +228,7 @@ async function main() {
 
   await fELP.initialize(
     [
-      "0x3344495EFDf239E9A68818a29b2d54993FB17570"
+      "0xb935Dcb88cae8dc4C016E4Bcd2f6115192ae4009"
     ],
     fELPDis.address
   );
