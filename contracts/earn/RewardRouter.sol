@@ -17,8 +17,6 @@ contract RewardRouter is ReentrancyGuardUpgradeable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
     using AddressUpgradeable for address payable;
 
-    // bool public isInitialized;
-
     address public gov;
 
     address public usdc; 
@@ -76,9 +74,6 @@ contract RewardRouter is ReentrancyGuardUpgradeable {
         address _etrVester,
         address _elpVester
     ) external initializer {
-        // require(!isInitialized, "RewardRouter: already initialized");
-        // isInitialized = true;
-
         gov = msg.sender;
 
         usdc = _usdc;

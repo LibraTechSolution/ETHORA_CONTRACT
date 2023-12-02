@@ -3,7 +3,6 @@
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-// import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "./interfaces/interfaces.sol";
@@ -12,18 +11,18 @@ import "./library/OptionMath.sol";
 /**
  * @author Heisenberg
  * @title Ethora Options
- * @notice Creates ERC721 Options
  */
 
 contract EthoraBinaryOptions is
     IEthoraBinaryOptions,
     ReentrancyGuardUpgradeable,
-    // ERC721,
     AccessControlUpgradeable
 {
     using SafeERC20Upgradeable for ERC20Upgradeable; 
     uint256 public nextTokenId;
     uint256 public totalMarketOI;
+    uint256 public ivFactorITM;
+    uint256 public ivFactorOTM;
     bool public isPaused;
     uint16 public stepSize; // Factor of 1e2
     string public override token0;
@@ -42,12 +41,7 @@ contract EthoraBinaryOptions is
     bytes32 public ROUTER_ROLE;
     bytes32 public PAUSER_ROLE;
     bytes32 public IV_ROLE;
-    uint256 public ivFactorITM;
-    uint256 public ivFactorOTM;
 
-    // constructor() {
-    //     _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-    // }
 
     function initialize() external initializer {
         stepSize = 25;
@@ -64,11 +58,11 @@ contract EthoraBinaryOptions is
      ***********************************************/
     
     function setIvConfig(
-        uint256 ivFactorITM_, 
-        uint256 ivFactorOTM_
+        uint256 _ivFactorITM, 
+        uint256 _ivFactorOTM
     ) external onlyRole(IV_ROLE) {
-        ivFactorITM = ivFactorITM_;
-        ivFactorOTM = ivFactorOTM_;
+        ivFactorITM = _ivFactorITM;
+        ivFactorOTM = _ivFactorOTM;
     }
 
     function ownerConfig(
@@ -148,7 +142,6 @@ contract EthoraBinaryOptions is
         optionID = _generateTokenId();
         userOptionIds[optionParams.user].push(optionID);
         options[optionID] = option;
-        // _mint(optionParams.user, optionID);
         optionOwners[optionID] = optionParams.user;
 
         uint256 referrerFee = _processReferralRebate(
@@ -216,7 +209,6 @@ contract EthoraBinaryOptions is
         } else {
             option.state = State.Expired;
             pool.unlock(optionID);
-            // _burn(optionID);
             delete optionOwners[optionID];
             emit Expire(optionID, option.premium, closingPrice, isAbove);
         }
@@ -348,24 +340,6 @@ contract EthoraBinaryOptions is
         return a < b ? a : b;
     }
 
-    // function supportsInterface(
-    //     bytes4 interfaceId
-    // ) public view override(ERC721, AccessControl) returns (bool) {
-    //     return super.supportsInterface(interfaceId);
-    // }
-
-    // function ownerOf(
-    //     uint256 tokenId
-    // )
-    //     public
-    //     view
-    //     virtual
-    //     override(ERC721, IEthoraBinaryOptions)
-    //     returns (address)
-    // {
-    //     return super.ownerOf(tokenId);
-    // }
-
     /************************************************
      *  INTERNAL OPTION UTILITY FUNCTIONS
      ***********************************************/
@@ -431,7 +405,6 @@ contract EthoraBinaryOptions is
         else emit LpLoss(optionID, profit - option.premium);
 
         // Burn the option
-        // _burn(optionID);
         delete optionOwners[optionID];
         option.state = State.Exercised;
         emit Exercise(user, optionID, profit, closingPrice, isAbove);
@@ -532,23 +505,12 @@ contract EthoraBinaryOptions is
     }
 
     function setToken(
-        string memory token0_,
-        string memory token1_
+        string memory _token0,
+        string memory _token1
     ) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        token0 = token0_;
-        token1 = token1_;
+        token0 = _token0;
+        token1 = _token1;
     }
-
-    // function _beforeTokenTransfer(address from, address to, uint256 firstTokenId, uint256 batchSize) internal virtual override {
-    //     if (
-    //         from != address(0) &&
-    //         to != address(0) &&
-    //         approvedAddresses[to] == false &&
-    //         approvedAddresses[from] == false
-    //     ) {
-    //         revert("Token transfer not allowed");
-    //     }
-    // }
 
     uint256[47] private __gap;
 }

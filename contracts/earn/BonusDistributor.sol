@@ -10,8 +10,6 @@ import "./Governable.sol";
 import "./../interfaces/IRewardDistributor.sol";
 import "./../interfaces/IRewardTracker.sol";
 
-// File: BonusDistributor.sol
-
 contract BonusDistributor is IRewardDistributor, ReentrancyGuard, Governable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;

@@ -19,8 +19,6 @@ contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
 
     uint8 public constant decimals = 18;
 
-    // bool public isInitialized;
-
     string public name;
     string public symbol;
 
@@ -58,9 +56,6 @@ contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
         external
         onlyGov
     {
-        // require(!isInitialized, "RewardTracker: already initialized");
-        // isInitialized = true;
-
         for (uint256 i = 0; i < _depositTokens.length; i++) {
             address depositToken = _depositTokens[i];
             isDepositToken[depositToken] = true;

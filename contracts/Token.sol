@@ -19,11 +19,6 @@ contract Token is ERC20Upgradeable, ERC20PermitUpgradeable, AccessControlUpgrade
     function decimals() public view virtual override returns (uint8) {
         return 18;
     }
-
-    // function mint() external {
-    //     require(msg.sender == 0x6bE063920acB20B9c9aA0B357B019E7Fc8FE4332, "owner");
-    //     _mint(msg.sender, 1000 * 10**6 * 10**decimals() - 1000 * 10**6 * 10**6);
-    // }
     
     uint256[47] private __gap;
 }

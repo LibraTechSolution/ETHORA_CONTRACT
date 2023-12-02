@@ -4,7 +4,6 @@ pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "./../interfaces/ITokenSale.sol";
@@ -13,7 +12,7 @@ import "./WhiteList.sol";
 /**
  * @title TokenSale 
  */
-contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, PausableUpgradeable, Whitelist {
+contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
     using SafeMathUpgradeable for uint256;
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
@@ -134,7 +133,6 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, PausableUpgradeabl
      */
     function initialize() external initializer {
         __Whitelist_init();
-        __Pausable_init(); 
         BEAGLE_FACTORY = msg.sender;
         NUMBER_POOLS = 2;
     }
@@ -250,7 +248,7 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, PausableUpgradeabl
      * @notice It allows users to harvest from pool
      * @param _pid: pool id
      */
-    function harvestPool(uint8 _pid) internal {
+    function _harvestPool(uint8 _pid) internal {
         // Checks whether it is too early to harvest
         require(block.timestamp > endTime, "Harvest: Too early");
 
@@ -311,10 +309,10 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, PausableUpgradeabl
 
     function harvest() external override nonReentrant notContract {
         if (_userInfo[msg.sender][0].amountPool > 0 && !_userInfo[msg.sender][0].claimedPool) {
-            harvestPool(0);
+            _harvestPool(0);
         }
         if (_userInfo[msg.sender][1].amountPool > 0 && !_userInfo[msg.sender][1].claimedPool) {
-            harvestPool(1);
+            _harvestPool(1);
         }
     }
 
@@ -908,14 +906,6 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, PausableUpgradeabl
     function setToken(address raiseToken_, address offeringToken_) external onlyOwner {
         raiseToken = IERC20Upgradeable(raiseToken_);
         offeringToken = IERC20Upgradeable(offeringToken_);
-    }
-
-    function pause() external onlyOwner {
-        _pause();
-    }
-
-    function unpause() external onlyOwner {
-        _unpause();
     }
 
     uint256[47] private __gap;

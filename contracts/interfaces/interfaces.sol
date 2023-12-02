@@ -76,7 +76,6 @@ interface IEthoraRouter {
         uint256 slippage;
         bool allowPartialFill;
         string referralCode;
-        // uint256 traderNFTId;
         uint256 settlementFee;
         bool isLimitOrder;
         bool isTradeResolved;
@@ -104,7 +103,6 @@ interface IEthoraRouter {
         uint256 slippage;
         bool allowPartialFill;
         string referralCode;
-        // uint256 traderNFTId;
         uint256 price;
         uint256 settlementFee;
         bool isLimitOrder;

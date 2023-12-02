@@ -60,17 +60,17 @@ contract EthoraRouter is AccessControlUpgradeable, IEthoraRouter {
     }
 
     function setPublisher(
-        address publisher_, 
-        address sfPublisher_
+        address _publisher, 
+        address _sfPublisher
     ) external onlyRole(DEFAULT_ADMIN_ROLE) {
-        publisher = publisher_;
-        sfPublisher = sfPublisher_;
+        publisher = _publisher;
+        sfPublisher = _sfPublisher;
     }
 
     function setAdmin(
-        address admin_
+        address _admin
     ) external onlyRole(DEFAULT_ADMIN_ROLE) {
-        admin = admin_;
+        admin = _admin;
     }
 
     function setKeeper(
