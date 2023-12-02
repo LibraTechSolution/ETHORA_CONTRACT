@@ -10,7 +10,7 @@ import "./../interfaces/ITokenSale.sol";
 import "./WhiteList.sol";
 
 /**
- * @title TokenSale 
+ * @title TokenSale
  */
 contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
     using SafeMathUpgradeable for uint256;
@@ -104,16 +104,30 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
     event Deposit(address indexed user, uint256 amount, uint8 indexed pid);
 
     // Harvest event
-    event Harvest(address indexed user, uint256 offeringAmount, uint256 excessAmount, uint8 indexed pid);
+    event Harvest(
+        address indexed user,
+        uint256 offeringAmount,
+        uint256 excessAmount,
+        uint8 indexed pid
+    );
 
     // Create VestingSchedule event
-    event CreateVestingSchedule(address indexed user, uint256 offeringAmount, uint256 excessAmount, uint8 indexed pid);
+    event CreateVestingSchedule(
+        address indexed user,
+        uint256 offeringAmount,
+        uint256 excessAmount,
+        uint8 indexed pid
+    );
 
     // Event for new start & end times
     event NewStartAndEndTimes(uint256 startTime, uint256 endTime);
 
     // Event when parameters are set for one of the pools
-    event PoolParametersSet(uint256 offeringAmountPool, uint256 raisingAmountPool, uint8 pid);
+    event PoolParametersSet(
+        uint256 offeringAmountPool,
+        uint256 raisingAmountPool,
+        uint8 pid
+    );
 
     // Event when released new amount
     event Released(address indexed beneficiary, uint256 amount);
@@ -176,13 +190,17 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
      * @param _amount: the number of LP token used (18 decimals)
      * @param _pid: pool id
      */
-    function depositPool(uint256 _amount, uint8 _pid) external override nonReentrant notContract {
+    function depositPool(
+        uint256 _amount,
+        uint8 _pid
+    ) external override nonReentrant notContract {
         // Checks whether the pool id is valid
         require(_pid < NUMBER_POOLS, "Deposit: Non valid pool id");
 
         // Checks that pool was set
         require(
-            _poolInformation[_pid].offeringAmountPool > 0 && _poolInformation[_pid].raisingAmountPool > 0,
+            _poolInformation[_pid].offeringAmountPool > 0 &&
+                _poolInformation[_pid].raisingAmountPool > 0,
             "Deposit: Pool not set"
         );
 
@@ -196,49 +214,65 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
         require(_amount > 0, "Deposit: Amount must be > 0");
 
         // Verify tokens were deposited properly
-        require(offeringToken.balanceOf(address(this)) >= totalTokensOffered, "Deposit: Tokens not deposited properly");
+        require(
+            offeringToken.balanceOf(address(this)) >= totalTokensOffered,
+            "Deposit: Tokens not deposited properly"
+        );
 
         if (!_poolInformation[_pid].isSpecialSale) {
             // Transfers funds to this contract
             raiseToken.safeTransferFrom(msg.sender, address(this), _amount);
 
             // Update the user status
-            _userInfo[msg.sender][_pid].amountPool = _userInfo[msg.sender][_pid].amountPool.add(_amount);
+            _userInfo[msg.sender][_pid].amountPool = _userInfo[msg.sender][_pid]
+                .amountPool
+                .add(_amount);
 
             // Check if the pool has a limit per user
             if (_poolInformation[_pid].limitPerUserInLP > 0) {
                 // Checks whether the limit has been reached
                 require(
-                    _userInfo[msg.sender][_pid].amountPool <= _poolInformation[_pid].limitPerUserInLP,
+                    _userInfo[msg.sender][_pid].amountPool <=
+                        _poolInformation[_pid].limitPerUserInLP,
                     "Deposit: New amount above user limit"
                 );
             }
 
             // Updates the totalAmount for pool
-            _poolInformation[_pid].totalAmountPool = _poolInformation[_pid].totalAmountPool.add(_amount);
+            _poolInformation[_pid].totalAmountPool = _poolInformation[_pid]
+                .totalAmountPool
+                .add(_amount);
 
             emit Deposit(msg.sender, _amount, _pid);
         } else {
             // Must meet one of three admission requirement
-            require(_isQualifiedWhitelist(msg.sender), "Deposit: Not meet any one of required conditions");
+            require(
+                _isQualifiedWhitelist(msg.sender),
+                "Deposit: Not meet any one of required conditions"
+            );
 
             // Transfers funds to this contract
             raiseToken.safeTransferFrom(msg.sender, address(this), _amount);
 
             // Update the user status
-            _userInfo[msg.sender][_pid].amountPool = _userInfo[msg.sender][_pid].amountPool.add(_amount);
+            _userInfo[msg.sender][_pid].amountPool = _userInfo[msg.sender][_pid]
+                .amountPool
+                .add(_amount);
 
             // Check if the pool has a limit per user
             if (_poolInformation[_pid].limitPerUserInLP > 0) {
                 // Checks whether the limit has been reached
                 require(
-                    _userInfo[msg.sender][_pid].amountPool <= _poolInformation[_pid].limitPerUserInLP,
+                    _userInfo[msg.sender][_pid].amountPool <=
+                        _poolInformation[_pid].limitPerUserInLP,
                     "Deposit: New amount above user limit"
                 );
             }
 
             // Updates the totalAmount for pool
-            _poolInformation[_pid].totalAmountPool = _poolInformation[_pid].totalAmountPool.add(_amount);
+            _poolInformation[_pid].totalAmountPool = _poolInformation[_pid]
+                .totalAmountPool
+                .add(_amount);
 
             emit Deposit(msg.sender, _amount, _pid);
         }
@@ -278,13 +312,17 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
 
         // Increment the sumTaxesOverflow
         if (userTaxOverflow > 0) {
-            _poolInformation[_pid].sumTaxesOverflow = _poolInformation[_pid].sumTaxesOverflow.add(userTaxOverflow);
+            _poolInformation[_pid].sumTaxesOverflow = _poolInformation[_pid]
+                .sumTaxesOverflow
+                .add(userTaxOverflow);
         }
 
         // Transfer these tokens back to the user if quantity > 0
         if (offeringTokenAmount > 0) {
             if (100 - _poolInformation[_pid].vestingPercentage > 0) {
-                uint256 amount = offeringTokenAmount.mul(100 - _poolInformation[_pid].vestingPercentage).div(100);
+                uint256 amount = offeringTokenAmount
+                    .mul(100 - _poolInformation[_pid].vestingPercentage)
+                    .div(100);
 
                 // Transfer the tokens at TGE
                 offeringToken.safeTransfer(msg.sender, amount);
@@ -293,12 +331,19 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
             }
             // If this pool is Vesting modal, create a VestingSchedule for each user
             if (_poolInformation[_pid].vestingPercentage > 0) {
-                uint256 amount = offeringTokenAmount.mul(_poolInformation[_pid].vestingPercentage).div(100);
+                uint256 amount = offeringTokenAmount
+                    .mul(_poolInformation[_pid].vestingPercentage)
+                    .div(100);
 
                 // Create VestingSchedule object
                 _createVestingSchedule(msg.sender, _pid, amount);
 
-                emit CreateVestingSchedule(msg.sender, amount, refundingTokenAmount, _pid);
+                emit CreateVestingSchedule(
+                    msg.sender,
+                    amount,
+                    refundingTokenAmount,
+                    _pid
+                );
             }
         }
 
@@ -308,10 +353,16 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
     }
 
     function harvest() external override nonReentrant notContract {
-        if (_userInfo[msg.sender][0].amountPool > 0 && !_userInfo[msg.sender][0].claimedPool) {
+        if (
+            _userInfo[msg.sender][0].amountPool > 0 &&
+            !_userInfo[msg.sender][0].claimedPool
+        ) {
             _harvestPool(0);
         }
-        if (_userInfo[msg.sender][1].amountPool > 0 && !_userInfo[msg.sender][1].claimedPool) {
+        if (
+            _userInfo[msg.sender][1].amountPool > 0 &&
+            !_userInfo[msg.sender][1].claimedPool
+        ) {
             _harvestPool(1);
         }
     }
@@ -322,9 +373,18 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
      * @param _offerAmount: the number of offering amount to withdraw
      * @dev This function is only callable by admin.
      */
-    function finalWithdraw(uint256 _lpAmount, uint256 _offerAmount) external override onlyOwner {
-        require(_lpAmount <= raiseToken.balanceOf(address(this)), "Operations: Not enough LP tokens");
-        require(_offerAmount <= offeringToken.balanceOf(address(this)), "Operations: Not enough offering tokens");
+    function finalWithdraw(
+        uint256 _lpAmount,
+        uint256 _offerAmount
+    ) external override onlyOwner {
+        require(
+            _lpAmount <= raiseToken.balanceOf(address(this)),
+            "Operations: Not enough LP tokens"
+        );
+        require(
+            _offerAmount <= offeringToken.balanceOf(address(this)),
+            "Operations: Not enough offering tokens"
+        );
 
         if (_lpAmount > 0) {
             raiseToken.safeTransfer(msg.sender, _lpAmount);
@@ -343,9 +403,18 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
      * @param _tokenAmount: the number of token amount to withdraw
      * @dev This function is only callable by admin.
      */
-    function recoverWrongTokens(address _tokenAddress, uint256 _tokenAmount) external onlyOwner {
-        require(_tokenAddress != address(raiseToken), "Recover: Cannot be LP token");
-        require(_tokenAddress != address(offeringToken), "Recover: Cannot be offering token");
+    function recoverWrongTokens(
+        address _tokenAddress,
+        uint256 _tokenAmount
+    ) external onlyOwner {
+        require(
+            _tokenAddress != address(raiseToken),
+            "Recover: Cannot be LP token"
+        );
+        require(
+            _tokenAddress != address(offeringToken),
+            "Recover: Cannot be offering token"
+        );
 
         IERC20Upgradeable(_tokenAddress).safeTransfer(msg.sender, _tokenAmount);
 
@@ -378,15 +447,24 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
         uint256 _vestingDuration,
         uint256 _vestingSlicePeriodSeconds
     ) external override onlyOwner {
-        require(block.timestamp < startTime, "Operations: Token sale has started");
+        require(
+            block.timestamp < startTime,
+            "Operations: Token sale has started"
+        );
         require(_pid < NUMBER_POOLS, "Operations: Pool does not exist");
         require(
             _vestingPercentage >= 0 && _vestingPercentage <= 100,
             "Operations: vesting percentage should exceeds 0 and interior 100"
         );
         require(_vestingDuration > 0, "duration must exceeds 0");
-        require(_vestingSlicePeriodSeconds >= 1, "slicePeriodSeconds must be exceeds 1");
-        require(_vestingSlicePeriodSeconds <= _vestingDuration, "slicePeriodSeconds must be interior duration");
+        require(
+            _vestingSlicePeriodSeconds >= 1,
+            "slicePeriodSeconds must be exceeds 1"
+        );
+        require(
+            _vestingSlicePeriodSeconds <= _vestingDuration,
+            "slicePeriodSeconds must be interior duration"
+        );
 
         _poolInformation[_pid].offeringAmountPool = _offeringAmountPool;
         _poolInformation[_pid].raisingAmountPool = _raisingAmountPool;
@@ -396,12 +474,15 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
         _poolInformation[_pid].vestingPercentage = _vestingPercentage;
         _poolInformation[_pid].vestingCliff = _vestingCliff;
         _poolInformation[_pid].vestingDuration = _vestingDuration;
-        _poolInformation[_pid].vestingSlicePeriodSeconds = _vestingSlicePeriodSeconds;
+        _poolInformation[_pid]
+            .vestingSlicePeriodSeconds = _vestingSlicePeriodSeconds;
 
         uint256 tokensDistributedAcrossPools;
 
         for (uint8 i = 0; i < NUMBER_POOLS; i++) {
-            tokensDistributedAcrossPools = tokensDistributedAcrossPools.add(_poolInformation[i].offeringAmountPool);
+            tokensDistributedAcrossPools = tokensDistributedAcrossPools.add(
+                _poolInformation[i].offeringAmountPool
+            );
         }
 
         // Update totalTokensOffered
@@ -416,11 +497,26 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
      * @param _endTime: the new end time
      * @dev This function is only callable by admin.
      */
-    function updateStartAndEndTimes(uint256 _startTime, uint256 _endTime) external onlyOwner {
-        require(_endTime < (block.timestamp + MAX_ETHORA_TIMES), "Operations: EndTime too far");
-        require(block.timestamp < startTime, "Operations: Token sale has started");
-        require(_startTime < _endTime, "Operations: New startTime must be lower than new endTime");
-        require(block.timestamp < _startTime, "Operations: New startTime must be higher than current timestamp");
+    function updateStartAndEndTimes(
+        uint256 _startTime,
+        uint256 _endTime
+    ) external onlyOwner {
+        require(
+            _endTime < (block.timestamp + MAX_ETHORA_TIMES),
+            "Operations: EndTime too far"
+        );
+        require(
+            block.timestamp < startTime,
+            "Operations: Token sale has started"
+        );
+        require(
+            _startTime < _endTime,
+            "Operations: New startTime must be lower than new endTime"
+        );
+        require(
+            block.timestamp < _startTime,
+            "Operations: New startTime must be higher than current timestamp"
+        );
 
         startTime = _startTime;
         endTime = _endTime;
@@ -438,19 +534,13 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
      * @return totalAmountPool: total amount pool deposited (in LP tokens)
      * @return sumTaxesOverflow: total taxes collected (starts at 0, increases with each harvest if overflow)
      */
-    function viewPoolInformation(uint256 _pid)
+    function viewPoolInformation(
+        uint256 _pid
+    )
         external
         view
         override
-        returns (
-            uint256,
-            uint256,
-            uint256,
-            bool,
-            uint256,
-            uint256,
-            bool
-        )
+        returns (uint256, uint256, uint256, bool, uint256, uint256, bool)
     {
         return (
             _poolInformation[_pid].raisingAmountPool,
@@ -471,17 +561,9 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
      * @return vestingDuration: the duration of vesting
      * @return vestingSlicePeriodSeconds: the slice period seconds of vesting
      */
-    function viewPoolVestingInformation(uint256 _pid)
-        external
-        view
-        override
-        returns (
-            uint256,
-            uint256,
-            uint256,
-            uint256
-        )
-    {
+    function viewPoolVestingInformation(
+        uint256 _pid
+    ) external view override returns (uint256, uint256, uint256, uint256) {
         return (
             _poolInformation[_pid].vestingPercentage,
             _poolInformation[_pid].vestingCliff,
@@ -496,12 +578,17 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
      * @param _pid: pool id
      * @return It returns the tax percentage
      */
-    function viewPoolTaxRateOverflow(uint256 _pid) external view override returns (uint256) {
+    function viewPoolTaxRateOverflow(
+        uint256 _pid
+    ) external view override returns (uint256) {
         if (!_poolInformation[_pid].hasTax) {
             return 0;
         } else {
             return
-                _calculateTaxOverflow(_poolInformation[_pid].totalAmountPool, _poolInformation[_pid].raisingAmountPool);
+                _calculateTaxOverflow(
+                    _poolInformation[_pid].totalAmountPool,
+                    _poolInformation[_pid].raisingAmountPool
+                );
         }
     }
 
@@ -511,12 +598,10 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
      * @param _pids[]: array of pids
      * @return
      */
-    function viewUserAllocationPools(address _user, uint8[] calldata _pids)
-        external
-        view
-        override
-        returns (uint256[] memory)
-    {
+    function viewUserAllocationPools(
+        address _user,
+        uint8[] calldata _pids
+    ) external view override returns (uint256[] memory) {
         uint256[] memory allocationPools = new uint256[](_pids.length);
         for (uint8 i = 0; i < _pids.length; i++) {
             allocationPools[i] = _getUserAllocationPool(_user, _pids[i]);
@@ -529,12 +614,10 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
      * @param _user: user address
      * @param _pids[]: array of pids
      */
-    function viewUserInfo(address _user, uint8[] calldata _pids)
-        external
-        view
-        override
-        returns (uint256[] memory, bool[] memory)
-    {
+    function viewUserInfo(
+        address _user,
+        uint8[] calldata _pids
+    ) external view override returns (uint256[] memory, bool[] memory) {
         uint256[] memory amountPools = new uint256[](_pids.length);
         bool[] memory statusPools = new bool[](_pids.length);
 
@@ -550,12 +633,10 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
      * @param _user: user address
      * @param _pids: array of pids
      */
-    function viewUserOfferingAndRefundingAmountsForPools(address _user, uint8[] calldata _pids)
-        external
-        view
-        override
-        returns (uint256[3][] memory)
-    {
+    function viewUserOfferingAndRefundingAmountsForPools(
+        address _user,
+        uint8[] calldata _pids
+    ) external view override returns (uint256[3][] memory) {
         uint256[3][] memory amountPools = new uint256[3][](_pids.length);
 
         for (uint8 i = 0; i < _pids.length; i++) {
@@ -571,7 +652,11 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
                 ) = _calculateOfferingAndRefundingAmountsPool(_user, _pids[i]);
             }
 
-            amountPools[i] = [userOfferingAmountPool, userRefundingAmountPool, userTaxAmountPool];
+            amountPools[i] = [
+                userOfferingAmountPool,
+                userRefundingAmountPool,
+                userTaxAmountPool
+            ];
         }
         return amountPools;
     }
@@ -580,7 +665,9 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
      * @notice Returns the number of vesting schedules associated to a beneficiary
      * @return The number of vesting schedules
      */
-    function getVestingSchedulesCountByBeneficiary(address _beneficiary) external view returns (uint256) {
+    function getVestingSchedulesCountByBeneficiary(
+        address _beneficiary
+    ) external view returns (uint256) {
         return holdersVestingCount[_beneficiary];
     }
 
@@ -588,7 +675,9 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
      * @notice Returns the vesting schedule id at the given index
      * @return The vesting schedule id
      */
-    function getVestingScheduleIdAtIndex(uint256 _index) external view returns (bytes32) {
+    function getVestingScheduleIdAtIndex(
+        uint256 _index
+    ) external view returns (bytes32) {
         require(_index < getVestingSchedulesCount(), "index out of bounds");
         return vestingSchedulesIds[_index];
     }
@@ -597,12 +686,14 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
      * @notice Returns the vesting schedule information of a given holder and index
      * @return The vesting schedule object
      */
-    function getVestingScheduleByAddressAndIndex(address _holder, uint256 _index)
-        external
-        view
-        returns (VestingSchedule memory)
-    {
-        return getVestingSchedule(computeVestingScheduleIdForAddressAndIndex(_holder, _index));
+    function getVestingScheduleByAddressAndIndex(
+        address _holder,
+        uint256 _index
+    ) external view returns (VestingSchedule memory) {
+        return
+            getVestingSchedule(
+                computeVestingScheduleIdForAddressAndIndex(_holder, _index)
+            );
     }
 
     /**
@@ -618,16 +709,26 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
      * @param _vestingScheduleId the vesting schedule identifier
      */
     function release(bytes32 _vestingScheduleId) external nonReentrant {
-        require(vestingSchedules[_vestingScheduleId].isVestingInitialized == true, "vesting schedule is not exist");
+        require(
+            vestingSchedules[_vestingScheduleId].isVestingInitialized == true,
+            "vesting schedule is not exist"
+        );
 
-        VestingSchedule storage vestingSchedule = vestingSchedules[_vestingScheduleId];
+        VestingSchedule storage vestingSchedule = vestingSchedules[
+            _vestingScheduleId
+        ];
         bool isBeneficiary = msg.sender == vestingSchedule.beneficiary;
         bool isOwner = msg.sender == owner();
-        require(isBeneficiary || isOwner, "only the beneficiary and owner can release vested tokens");
+        require(
+            isBeneficiary || isOwner,
+            "only the beneficiary and owner can release vested tokens"
+        );
         uint256 vestedAmount = _computeReleasableAmount(vestingSchedule);
         require(vestedAmount > 0, "no vested tokens to release");
         vestingSchedule.released = vestingSchedule.released.add(vestedAmount);
-        vestingSchedulesTotalAmount = vestingSchedulesTotalAmount.sub(vestedAmount);
+        vestingSchedulesTotalAmount = vestingSchedulesTotalAmount.sub(
+            vestedAmount
+        );
         offeringToken.safeTransfer(vestingSchedule.beneficiary, vestedAmount);
 
         emit Released(vestingSchedule.beneficiary, vestedAmount);
@@ -656,10 +757,17 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
      * @notice Returns the vested amount of tokens for the given vesting schedule identifier
      * @return The number of vested count
      */
-    function computeReleasableAmount(bytes32 _vestingScheduleId) public view returns (uint256) {
-        require(vestingSchedules[_vestingScheduleId].isVestingInitialized == true, "vesting schedule is not exist");
+    function computeReleasableAmount(
+        bytes32 _vestingScheduleId
+    ) public view returns (uint256) {
+        require(
+            vestingSchedules[_vestingScheduleId].isVestingInitialized == true,
+            "vesting schedule is not exist"
+        );
 
-        VestingSchedule memory vestingSchedule = vestingSchedules[_vestingScheduleId];
+        VestingSchedule memory vestingSchedule = vestingSchedules[
+            _vestingScheduleId
+        ];
         return _computeReleasableAmount(vestingSchedule);
     }
 
@@ -667,7 +775,9 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
      * @notice Returns the vesting schedule information of a given identifier
      * @return The vesting schedule object
      */
-    function getVestingSchedule(bytes32 _vestingScheduleId) public view returns (VestingSchedule memory) {
+    function getVestingSchedule(
+        bytes32 _vestingScheduleId
+    ) public view returns (VestingSchedule memory) {
         return vestingSchedules[_vestingScheduleId];
     }
 
@@ -675,23 +785,39 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
      * @notice Returns the amount of offering token that can be withdrawn by the owner
      * @return The amount of offering token
      */
-    function getWithdrawableOfferingTokenAmount() public view returns (uint256) {
-        return offeringToken.balanceOf(address(this)).sub(vestingSchedulesTotalAmount);
+    function getWithdrawableOfferingTokenAmount()
+        public
+        view
+        returns (uint256)
+    {
+        return
+            offeringToken.balanceOf(address(this)).sub(
+                vestingSchedulesTotalAmount
+            );
     }
 
     /**
      * @notice Computes the next vesting schedule identifier for a given holder address
      * @return The id string
      */
-    function computeNextVestingScheduleIdForHolder(address _holder) public view returns (bytes32) {
-        return computeVestingScheduleIdForAddressAndIndex(_holder, holdersVestingCount[_holder]);
+    function computeNextVestingScheduleIdForHolder(
+        address _holder
+    ) public view returns (bytes32) {
+        return
+            computeVestingScheduleIdForAddressAndIndex(
+                _holder,
+                holdersVestingCount[_holder]
+            );
     }
 
     /**
      * @notice Computes the next vesting schedule identifier for an address and an index
      * @return The id string
      */
-    function computeVestingScheduleIdForAddressAndIndex(address _holder, uint256 _index) public pure returns (bytes32) {
+    function computeVestingScheduleIdForAddressAndIndex(
+        address _holder,
+        uint256 _index
+    ) public pure returns (bytes32) {
         return keccak256(abi.encodePacked(_holder, _index));
     }
 
@@ -699,10 +825,21 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
      * @notice Computes the next vesting schedule identifier for an address and an pid
      * @return The id string
      */
-    function computeVestingScheduleIdForAddressAndPid(address _holder, uint256 _pid) external view returns (bytes32) {
-        require(_pid < NUMBER_POOLS, "ComputeVestingScheduleId: Non valid pool id");
-        bytes32 vestingScheduleId = computeVestingScheduleIdForAddressAndIndex(_holder, 0);
-        VestingSchedule memory vestingSchedule = vestingSchedules[vestingScheduleId];
+    function computeVestingScheduleIdForAddressAndPid(
+        address _holder,
+        uint256 _pid
+    ) external view returns (bytes32) {
+        require(
+            _pid < NUMBER_POOLS,
+            "ComputeVestingScheduleId: Non valid pool id"
+        );
+        bytes32 vestingScheduleId = computeVestingScheduleIdForAddressAndIndex(
+            _holder,
+            0
+        );
+        VestingSchedule memory vestingSchedule = vestingSchedules[
+            vestingScheduleId
+        ];
         if (vestingSchedule.pid == _pid) {
             return vestingScheduleId;
         } else {
@@ -721,17 +858,25 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
      * @notice Computes the releasable amount of tokens for a vesting schedule
      * @return The amount of releasable tokens
      */
-    function _computeReleasableAmount(VestingSchedule memory _vestingSchedule) internal view returns (uint256) {
+    function _computeReleasableAmount(
+        VestingSchedule memory _vestingSchedule
+    ) internal view returns (uint256) {
         uint256 currentTime = getCurrentTime();
         uint256 cliffTime = _poolInformation[_vestingSchedule.pid].vestingCliff;
-        uint256 durationTime = _poolInformation[_vestingSchedule.pid].vestingDuration;
+        uint256 durationTime = _poolInformation[_vestingSchedule.pid]
+            .vestingDuration;
         if (currentTime < vestingStartTime + cliffTime) {
             return 0;
-        } else if (currentTime >= vestingStartTime.add(durationTime) || vestingRevoked) {
+        } else if (
+            currentTime >= vestingStartTime.add(durationTime) || vestingRevoked
+        ) {
             return _vestingSchedule.amountTotal.sub(_vestingSchedule.released);
         } else {
-            uint256 timeFromStart = currentTime.sub(vestingStartTime).sub(cliffTime);
-            uint256 secondsPerSlice = _poolInformation[_vestingSchedule.pid].vestingSlicePeriodSeconds;
+            uint256 timeFromStart = currentTime.sub(vestingStartTime).sub(
+                cliffTime
+            );
+            uint256 secondsPerSlice = _poolInformation[_vestingSchedule.pid]
+                .vestingSlicePeriodSeconds;
 
             uint256 vestedSlicePeriods;
 
@@ -748,12 +893,16 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
             uint256 vestedAmount;
             if (cliffTime > 0) {
                 // In case there's cliff
-                vestedAmount = _vestingSchedule.amountTotal.mul(vestedSeconds).div(
-                    durationTime.sub(cliffTime).add(secondsPerSlice)
-                );
+                vestedAmount = _vestingSchedule
+                    .amountTotal
+                    .mul(vestedSeconds)
+                    .div(durationTime.sub(cliffTime).add(secondsPerSlice));
             } else {
                 // In case there's no cliff
-                vestedAmount = _vestingSchedule.amountTotal.mul(vestedSeconds).div(durationTime);
+                vestedAmount = _vestingSchedule
+                    .amountTotal
+                    .mul(vestedSeconds)
+                    .div(durationTime);
             }
             vestedAmount = vestedAmount.sub(_vestingSchedule.released);
             return vestedAmount;
@@ -776,9 +925,20 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
             "can not create vesting schedule with sufficient tokens"
         );
 
-        bytes32 vestingScheduleId = computeNextVestingScheduleIdForHolder(_beneficiary);
-        require(vestingSchedules[vestingScheduleId].beneficiary == address(0), "vestingScheduleId is been created");
-        vestingSchedules[vestingScheduleId] = VestingSchedule(true, _beneficiary, _pid, _amount, 0);
+        bytes32 vestingScheduleId = computeNextVestingScheduleIdForHolder(
+            _beneficiary
+        );
+        require(
+            vestingSchedules[vestingScheduleId].beneficiary == address(0),
+            "vestingScheduleId is been created"
+        );
+        vestingSchedules[vestingScheduleId] = VestingSchedule(
+            true,
+            _beneficiary,
+            _pid,
+            _amount,
+            0
+        );
         vestingSchedulesTotalAmount = vestingSchedulesTotalAmount.add(_amount);
         vestingSchedulesIds.push(vestingScheduleId);
         holdersVestingCount[_beneficiary]++;
@@ -789,11 +949,10 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
      * @dev 100,000,000,000 means 0.1 (10%) / 1 means 0.0000000000001 (0.0000001%) / 1,000,000,000,000 means 1 (100%)
      * @return It returns the tax percentage
      */
-    function _calculateTaxOverflow(uint256 _totalAmountPool, uint256 _raisingAmountPool)
-        internal
-        pure
-        returns (uint256)
-    {
+    function _calculateTaxOverflow(
+        uint256 _totalAmountPool,
+        uint256 _raisingAmountPool
+    ) internal pure returns (uint256) {
         uint256 ratioOverflow = _totalAmountPool.div(_raisingAmountPool);
         if (ratioOverflow >= 1500) {
             return 250000000; // 0.0125%
@@ -819,31 +978,37 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
      * @return {uint256, uint256, uint256} It returns the offering amount, the refunding amount (in LP tokens),
      * and the tax (if any, else 0)
      */
-    function _calculateOfferingAndRefundingAmountsPool(address _user, uint8 _pid)
-        internal
-        view
-        returns (
-            uint256,
-            uint256,
-            uint256
-        )
-    {
+    function _calculateOfferingAndRefundingAmountsPool(
+        address _user,
+        uint8 _pid
+    ) internal view returns (uint256, uint256, uint256) {
         uint256 userOfferingAmount;
         uint256 userRefundingAmount;
         uint256 taxAmount;
 
-        if (_poolInformation[_pid].totalAmountPool > _poolInformation[_pid].raisingAmountPool) {
+        if (
+            _poolInformation[_pid].totalAmountPool >
+            _poolInformation[_pid].raisingAmountPool
+        ) {
             // Calculate allocation for the user
             uint256 allocation = _getUserAllocationPool(_user, _pid);
 
             // Calculate the offering amount for the user based on the offeringAmount for the pool
-            userOfferingAmount = _poolInformation[_pid].offeringAmountPool.mul(allocation).div(1e12);
+            userOfferingAmount = _poolInformation[_pid]
+                .offeringAmountPool
+                .mul(allocation)
+                .div(1e12);
 
             // Calculate the payAmount
-            uint256 payAmount = _poolInformation[_pid].raisingAmountPool.mul(allocation).div(1e12);
+            uint256 payAmount = _poolInformation[_pid]
+                .raisingAmountPool
+                .mul(allocation)
+                .div(1e12);
 
             // Calculate the pre-tax refunding amount
-            userRefundingAmount = _userInfo[_user][_pid].amountPool.sub(payAmount);
+            userRefundingAmount = _userInfo[_user][_pid].amountPool.sub(
+                payAmount
+            );
 
             // Retrieve the tax rate
             if (_poolInformation[_pid].hasTax) {
@@ -862,9 +1027,10 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
             userRefundingAmount = 0;
             taxAmount = 0;
             // _userInfo[_user] / (raisingAmount / offeringAmount)
-            userOfferingAmount = _userInfo[_user][_pid].amountPool.mul(_poolInformation[_pid].offeringAmountPool).div(
-                _poolInformation[_pid].raisingAmountPool
-            );
+            userOfferingAmount = _userInfo[_user][_pid]
+                .amountPool
+                .mul(_poolInformation[_pid].offeringAmountPool)
+                .div(_poolInformation[_pid].raisingAmountPool);
         }
         return (userOfferingAmount, userRefundingAmount, taxAmount);
     }
@@ -876,9 +1042,15 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
      * @param _pid: pool id
      * @return It returns the user's share of pool
      */
-    function _getUserAllocationPool(address _user, uint8 _pid) internal view returns (uint256) {
+    function _getUserAllocationPool(
+        address _user,
+        uint8 _pid
+    ) internal view returns (uint256) {
         if (_poolInformation[_pid].totalAmountPool > 0) {
-            return _userInfo[_user][_pid].amountPool.mul(1e18).div(_poolInformation[_pid].totalAmountPool.mul(1e6));
+            return
+                _userInfo[_user][_pid].amountPool.mul(1e18).div(
+                    _poolInformation[_pid].totalAmountPool.mul(1e6)
+                );
         } else {
             return 0;
         }
@@ -903,7 +1075,10 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
         return isWhitelisted(_user);
     }
 
-    function setToken(address raiseToken_, address offeringToken_) external onlyOwner {
+    function setToken(
+        address raiseToken_,
+        address offeringToken_
+    ) external onlyOwner {
         raiseToken = IERC20Upgradeable(raiseToken_);
         offeringToken = IERC20Upgradeable(offeringToken_);
     }

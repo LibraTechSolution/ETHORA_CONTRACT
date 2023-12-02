@@ -9,9 +9,10 @@ interface IElpManager {
         address account
     ) external returns (uint256 mint);
 
-    function withdrawForAccount(uint256 tokenXAmount, address account)
-        external
-        returns (uint256 burn);
+    function withdrawForAccount(
+        uint256 tokenXAmount,
+        address account
+    ) external returns (uint256 burn);
 
     function toTokenX(uint256 amount) external view returns (uint256);
 }

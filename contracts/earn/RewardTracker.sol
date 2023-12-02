@@ -52,10 +52,10 @@ contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
         symbol = _symbol;
     }
 
-    function initialize(address[] memory _depositTokens, address _distributor)
-        external
-        onlyGov
-    {
+    function initialize(
+        address[] memory _depositTokens,
+        address _distributor
+    ) external onlyGov {
         for (uint256 i = 0; i < _depositTokens.length; i++) {
             address depositToken = _depositTokens[i];
             isDepositToken[depositToken] = true;
@@ -64,31 +64,28 @@ contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
         distributor = _distributor;
     }
 
-    function setDepositToken(address _depositToken, bool _isDepositToken)
-        external
-        onlyGov
-    {
+    function setDepositToken(
+        address _depositToken,
+        bool _isDepositToken
+    ) external onlyGov {
         isDepositToken[_depositToken] = _isDepositToken;
     }
 
-    function setInPrivateTransferMode(bool _inPrivateTransferMode)
-        external
-        onlyGov
-    {
+    function setInPrivateTransferMode(
+        bool _inPrivateTransferMode
+    ) external onlyGov {
         inPrivateTransferMode = _inPrivateTransferMode;
     }
 
-    function setInPrivateStakingMode(bool _inPrivateStakingMode)
-        external
-        onlyGov
-    {
+    function setInPrivateStakingMode(
+        bool _inPrivateStakingMode
+    ) external onlyGov {
         inPrivateStakingMode = _inPrivateStakingMode;
     }
 
-    function setInPrivateClaimingMode(bool _inPrivateClaimingMode)
-        external
-        onlyGov
-    {
+    function setInPrivateClaimingMode(
+        bool _inPrivateClaimingMode
+    ) external onlyGov {
         inPrivateClaimingMode = _inPrivateClaimingMode;
     }
 
@@ -105,20 +102,16 @@ contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
         IERC20(_token).safeTransfer(_account, _amount);
     }
 
-    function balanceOf(address _account)
-        external
-        view
-        override
-        returns (uint256)
-    {
+    function balanceOf(
+        address _account
+    ) external view override returns (uint256) {
         return balances[_account];
     }
 
-    function stake(address _depositToken, uint256 _amount)
-        external
-        override
-        nonReentrant
-    {
+    function stake(
+        address _depositToken,
+        uint256 _amount
+    ) external override nonReentrant {
         if (inPrivateStakingMode) {
             revert("RewardTracker: action not enabled");
         }
@@ -135,11 +128,10 @@ contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
         _stake(_fundingAccount, _account, _depositToken, _amount);
     }
 
-    function unstake(address _depositToken, uint256 _amount)
-        external
-        override
-        nonReentrant
-    {
+    function unstake(
+        address _depositToken,
+        uint256 _amount
+    ) external override nonReentrant {
         if (inPrivateStakingMode) {
             revert("RewardTracker: action not enabled");
         }
@@ -156,29 +148,25 @@ contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
         _unstake(_account, _depositToken, _amount, _receiver);
     }
 
-    function transfer(address _recipient, uint256 _amount)
-        external
-        override
-        returns (bool)
-    {
+    function transfer(
+        address _recipient,
+        uint256 _amount
+    ) external override returns (bool) {
         _transfer(msg.sender, _recipient, _amount);
         return true;
     }
 
-    function allowance(address _owner, address _spender)
-        external
-        view
-        override
-        returns (uint256)
-    {
+    function allowance(
+        address _owner,
+        address _spender
+    ) external view override returns (uint256) {
         return allowances[_owner][_spender];
     }
 
-    function approve(address _spender, uint256 _amount)
-        external
-        override
-        returns (bool)
-    {
+    function approve(
+        address _spender,
+        uint256 _amount
+    ) external override returns (bool) {
         _approve(msg.sender, _spender, _amount);
         return true;
     }
@@ -210,34 +198,26 @@ contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
         _updateRewards(address(0));
     }
 
-    function claim(address _receiver)
-        external
-        override
-        nonReentrant
-        returns (uint256)
-    {
+    function claim(
+        address _receiver
+    ) external override nonReentrant returns (uint256) {
         if (inPrivateClaimingMode) {
             revert("RewardTracker: action not enabled");
         }
         return _claim(msg.sender, _receiver);
     }
 
-    function claimForAccount(address _account, address _receiver)
-        external
-        override
-        nonReentrant
-        returns (uint256)
-    {
+    function claimForAccount(
+        address _account,
+        address _receiver
+    ) external override nonReentrant returns (uint256) {
         _validateHandler();
         return _claim(_account, _receiver);
     }
 
-    function claimable(address _account)
-        public
-        view
-        override
-        returns (uint256)
-    {
+    function claimable(
+        address _account
+    ) public view override returns (uint256) {
         uint256 stakedAmount = stakedAmounts[_account];
         if (stakedAmount == 0) {
             return claimableReward[_account];
@@ -265,10 +245,10 @@ contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
         return IRewardDistributor(distributor).rewardToken();
     }
 
-    function _claim(address _account, address _receiver)
-        private
-        returns (uint256)
-    {
+    function _claim(
+        address _account,
+        address _receiver
+    ) private returns (uint256) {
         _updateRewards(_account);
 
         uint256 tokenAmount = claimableReward[_account];

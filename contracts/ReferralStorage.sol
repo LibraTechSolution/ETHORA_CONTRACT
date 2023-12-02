@@ -50,20 +50,14 @@ contract ReferralStorage is IReferralStorage, Ownable {
      *  ADMIN ONLY FUNCTIONS
      ***********************************************/
 
-    function setOperator(address operator, bool state)
-        external
-        onlyOwner
-    {
+    function setOperator(address operator, bool state) external onlyOwner {
         operators[operator] = state;
     }
 
     /**
      * @notice Sets referrer's tier
      */
-    function setReferrerTier(address _referrer, uint8 tier)
-        external
-        override
-    {
+    function setReferrerTier(address _referrer, uint8 tier) external override {
         require(tier < 3);
         require(operators[msg.sender], "ReferralStorage: not operator");
         referrerTier[_referrer] = tier;
@@ -73,10 +67,10 @@ contract ReferralStorage is IReferralStorage, Ownable {
     /**
      * @notice Sets referral code for trader
      */
-    function setTraderReferralCode(address user, string memory _code)
-        external
-        override
-    {
+    function setTraderReferralCode(
+        address user,
+        string memory _code
+    ) external override {
         require(operators[msg.sender], "ReferralStorage: not operator");
         _setTraderReferralCode(user, _code);
     }
@@ -101,7 +95,10 @@ contract ReferralStorage is IReferralStorage, Ownable {
             codeOwner[_code] == address(0),
             "ReferralStorage: code already exists"
         );
-        require(bytes(userCode[msg.sender]).length == 0, "ReferralStorage: created code");
+        require(
+            bytes(userCode[msg.sender]).length == 0,
+            "ReferralStorage: created code"
+        );
 
         codeOwner[_code] = msg.sender;
         userCode[msg.sender] = _code;
@@ -111,12 +108,9 @@ contract ReferralStorage is IReferralStorage, Ownable {
     /**
      * @notice Returns the referrer associated with a trader
      */
-    function getTraderReferralInfo(address user)
-        external
-        view
-        override
-        returns (string memory code, address referrer)
-    {
+    function getTraderReferralInfo(
+        address user
+    ) external view override returns (string memory code, address referrer) {
         code = traderReferralCodes[user];
         if (bytes(code).length != 0) {
             referrer = codeOwner[code];
@@ -129,7 +123,10 @@ contract ReferralStorage is IReferralStorage, Ownable {
 
     function _setTraderReferralCode(address user, string memory _code) private {
         require(!router.tradeds(user), "ReferralStorage: traded");
-        require(codeOwner[_code] != address(0), "ReferralStorage: code not exist");
+        require(
+            codeOwner[_code] != address(0),
+            "ReferralStorage: code not exist"
+        );
         traderReferralCodes[user] = _code;
         emit UpdateTraderReferralCode(user, _code);
     }

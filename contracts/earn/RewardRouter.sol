@@ -19,7 +19,7 @@ contract RewardRouter is ReentrancyGuardUpgradeable {
 
     address public gov;
 
-    address public usdc; 
+    address public usdc;
 
     address public etr;
     address public esEtr;
@@ -116,11 +116,10 @@ contract RewardRouter is ReentrancyGuardUpgradeable {
         }
     }
 
-    function stakeEtrForAccount(address _account, uint256 _amount)
-        external
-        nonReentrant
-        onlyGov
-    {
+    function stakeEtrForAccount(
+        address _account,
+        uint256 _amount
+    ) external nonReentrant onlyGov {
         _stakeEtr(msg.sender, _account, etr, _amount);
     }
 
@@ -140,11 +139,10 @@ contract RewardRouter is ReentrancyGuardUpgradeable {
         _unstakeEtr(msg.sender, esEtr, _amount, true);
     }
 
-    function mintAndStakeElp(uint256 _amount, uint256 _minElp)
-        external
-        nonReentrant
-        returns (uint256)
-    {
+    function mintAndStakeElp(
+        uint256 _amount,
+        uint256 _minElp
+    ) external nonReentrant returns (uint256) {
         require(_amount > 0, "RewardRouter: invalid _amount");
 
         address account = msg.sender;
@@ -171,11 +169,9 @@ contract RewardRouter is ReentrancyGuardUpgradeable {
         return elpAmount;
     }
 
-    function unstakeAndRedeemElp(uint256 _elpAmount)
-        external
-        nonReentrant
-        returns (uint256)
-    {
+    function unstakeAndRedeemElp(
+        uint256 _elpAmount
+    ) external nonReentrant returns (uint256) {
         require(_elpAmount > 0, "RewardRouter: invalid _elpAmount");
 
         address account = msg.sender;
@@ -229,11 +225,9 @@ contract RewardRouter is ReentrancyGuardUpgradeable {
         _compound(msg.sender);
     }
 
-    function compoundForAccount(address _account)
-        external
-        nonReentrant
-        onlyGov
-    {
+    function compoundForAccount(
+        address _account
+    ) external nonReentrant onlyGov {
         _compound(_account);
     }
 
@@ -296,11 +290,9 @@ contract RewardRouter is ReentrancyGuardUpgradeable {
         }
     }
 
-    function batchCompoundForAccounts(address[] memory _accounts)
-        external
-        nonReentrant
-        onlyGov
-    {
+    function batchCompoundForAccounts(
+        address[] memory _accounts
+    ) external nonReentrant onlyGov {
         for (uint256 i = 0; i < _accounts.length; i++) {
             _compound(_accounts[i]);
         }
@@ -379,7 +371,11 @@ contract RewardRouter is ReentrancyGuardUpgradeable {
 
         uint256 esEtrBalance = IERC20Upgradeable(esEtr).balanceOf(_sender);
         if (esEtrBalance > 0) {
-            IERC20Upgradeable(esEtr).transferFrom(_sender, receiver, esEtrBalance);
+            IERC20Upgradeable(esEtr).transferFrom(
+                _sender,
+                receiver,
+                esEtrBalance
+            );
         }
 
         uint256 elpAmount = IRewardTracker(feeElpTracker).depositBalances(
@@ -624,6 +620,6 @@ contract RewardRouter is ReentrancyGuardUpgradeable {
 
         emit UnstakeEtr(_account, _token, _amount);
     }
-        
+
     uint256[47] private __gap;
 }

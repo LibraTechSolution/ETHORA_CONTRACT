@@ -56,18 +56,17 @@ contract BaseToken is IERC20, IBaseToken {
         gov = _gov;
     }
 
-    function setInfo(string memory _name, string memory _symbol)
-        external
-        onlyGov
-    {
+    function setInfo(
+        string memory _name,
+        string memory _symbol
+    ) external onlyGov {
         name = _name;
         symbol = _symbol;
     }
 
-    function setYieldTrackers(address[] memory _yieldTrackers)
-        external
-        onlyGov
-    {
+    function setYieldTrackers(
+        address[] memory _yieldTrackers
+    ) external onlyGov {
         yieldTrackers = _yieldTrackers;
     }
 
@@ -88,11 +87,9 @@ contract BaseToken is IERC20, IBaseToken {
         IERC20(_token).safeTransfer(_account, _amount);
     }
 
-    function setInPrivateTransferMode(bool _inPrivateTransferMode)
-        external
-        override
-        onlyGov
-    {
+    function setInPrivateTransferMode(
+        bool _inPrivateTransferMode
+    ) external override onlyGov {
         inPrivateTransferMode = _inPrivateTransferMode;
     }
 
@@ -117,10 +114,10 @@ contract BaseToken is IERC20, IBaseToken {
         nonStakingSupply = nonStakingSupply.sub(balances[_account]);
     }
 
-    function recoverClaim(address _account, address _receiver)
-        external
-        onlyAdmin
-    {
+    function recoverClaim(
+        address _account,
+        address _receiver
+    ) external onlyAdmin {
         for (uint256 i = 0; i < yieldTrackers.length; i++) {
             address yieldTracker = yieldTrackers[i];
             IYieldTracker(yieldTracker).claim(_account, _receiver);
@@ -138,50 +135,40 @@ contract BaseToken is IERC20, IBaseToken {
         return totalSupply.sub(nonStakingSupply);
     }
 
-    function balanceOf(address _account)
-        external
-        view
-        override
-        returns (uint256)
-    {
+    function balanceOf(
+        address _account
+    ) external view override returns (uint256) {
         return balances[_account];
     }
 
-    function stakedBalance(address _account)
-        external
-        view
-        override
-        returns (uint256)
-    {
+    function stakedBalance(
+        address _account
+    ) external view override returns (uint256) {
         if (nonStakingAccounts[_account]) {
             return 0;
         }
         return balances[_account];
     }
 
-    function transfer(address _recipient, uint256 _amount)
-        external
-        override
-        returns (bool)
-    {
+    function transfer(
+        address _recipient,
+        uint256 _amount
+    ) external override returns (bool) {
         _transfer(msg.sender, _recipient, _amount);
         return true;
     }
 
-    function allowance(address _owner, address _spender)
-        external
-        view
-        override
-        returns (uint256)
-    {
+    function allowance(
+        address _owner,
+        address _spender
+    ) external view override returns (uint256) {
         return allowances[_owner][_spender];
     }
 
-    function approve(address _spender, uint256 _amount)
-        external
-        override
-        returns (bool)
-    {
+    function approve(
+        address _spender,
+        uint256 _amount
+    ) external override returns (bool) {
         _approve(msg.sender, _spender, _amount);
         return true;
     }

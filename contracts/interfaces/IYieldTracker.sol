@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: BUSL-1.1
 
 pragma solidity ^0.8.4;
+
 interface IYieldTracker {
-    function claim(address _account, address _receiver)
-        external
-        returns (uint256);
+    function claim(
+        address _account,
+        address _receiver
+    ) external returns (uint256);
 
     function updateRewards(address _account) external;
 

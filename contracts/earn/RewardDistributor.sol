@@ -35,7 +35,10 @@ contract RewardDistributor is IRewardDistributor, ReentrancyGuard, Governable {
         admin = msg.sender;
     }
 
-    function setInit(address _rewardToken, address _rewardTracker) external onlyGov {
+    function setInit(
+        address _rewardToken,
+        address _rewardTracker
+    ) external onlyGov {
         rewardToken = _rewardToken;
         rewardTracker = _rewardTracker;
     }

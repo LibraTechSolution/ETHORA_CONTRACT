@@ -18,7 +18,7 @@ contract EthoraBinaryOptions is
     ReentrancyGuardUpgradeable,
     AccessControlUpgradeable
 {
-    using SafeERC20Upgradeable for ERC20Upgradeable; 
+    using SafeERC20Upgradeable for ERC20Upgradeable;
     uint256 public nextTokenId;
     uint256 public totalMarketOI;
     uint256 public ivFactorITM;
@@ -37,17 +37,16 @@ contract EthoraBinaryOptions is
     mapping(uint256 => Option) public override options;
     mapping(address => uint256[]) public userOptionIds;
     mapping(address => bool) public approvedAddresses;
-    mapping(uint256 => address) public override optionOwners; 
+    mapping(uint256 => address) public override optionOwners;
     bytes32 public ROUTER_ROLE;
     bytes32 public PAUSER_ROLE;
     bytes32 public IV_ROLE;
-
 
     function initialize() external initializer {
         stepSize = 25;
         ROUTER_ROLE = keccak256("ROUTER_ROLE");
         PAUSER_ROLE = keccak256("PAUSER_ROLE");
-        IV_ROLE =  keccak256("ROUTER_ROLE");
+        IV_ROLE = keccak256("ROUTER_ROLE");
         ivFactorITM = 1e3;
         ivFactorOTM = 50;
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -56,9 +55,9 @@ contract EthoraBinaryOptions is
     /************************************************
      *  INITIALIZATION FUNCTIONS
      ***********************************************/
-    
+
     function setIvConfig(
-        uint256 _ivFactorITM, 
+        uint256 _ivFactorITM,
         uint256 _ivFactorOTM
     ) external onlyRole(IV_ROLE) {
         ivFactorITM = _ivFactorITM;
@@ -137,7 +136,7 @@ contract EthoraBinaryOptions is
             optionParams.amount / 2,
             queuedTime + optionParams.period,
             optionParams.totalFee,
-            queuedTime           
+            queuedTime
         );
         optionID = _generateTokenId();
         userOptionIds[optionParams.user].push(optionID);

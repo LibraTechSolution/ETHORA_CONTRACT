@@ -39,7 +39,10 @@ contract BonusDistributor is IRewardDistributor, ReentrancyGuard, Governable {
         admin = msg.sender;
     }
 
-     function setInit(address _rewardToken, address _rewardTracker) external onlyGov {
+    function setInit(
+        address _rewardToken,
+        address _rewardTracker
+    ) external onlyGov {
         rewardToken = _rewardToken;
         rewardTracker = _rewardTracker;
     }
@@ -61,10 +64,9 @@ contract BonusDistributor is IRewardDistributor, ReentrancyGuard, Governable {
         lastDistributionTime = block.timestamp;
     }
 
-    function setBonusMultiplier(uint256 _bonusMultiplierBasisPoints)
-        external
-        onlyAdmin
-    {
+    function setBonusMultiplier(
+        uint256 _bonusMultiplierBasisPoints
+    ) external onlyAdmin {
         require(
             lastDistributionTime != 0,
             "BonusDistributor: invalid lastDistributionTime"

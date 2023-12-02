@@ -14,7 +14,11 @@ contract Faucet is Ownable {
     mapping(address => uint256) public lastSavedTimestamp;
     mapping(bytes32 => bool) public previousHashedMessages;
 
-    constructor(address _token, address _fee_collector, uint256 _startTimestamp) {
+    constructor(
+        address _token,
+        address _fee_collector,
+        uint256 _startTimestamp
+    ) {
         fee_collector = _fee_collector;
         token = USDC(_token);
         amount = 500 * (10 ** token.decimals());

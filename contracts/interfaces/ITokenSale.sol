@@ -24,40 +24,33 @@ interface ITokenSale {
         uint256 _vestingSlicePeriodSeconds
     ) external;
 
-    function viewPoolInformation(uint256 _pid)
+    function viewPoolInformation(
+        uint256 _pid
+    )
         external
         view
-        returns (
-            uint256,
-            uint256,
-            uint256,
-            bool,
-            uint256,
-            uint256,
-            bool
-        );
+        returns (uint256, uint256, uint256, bool, uint256, uint256, bool);
 
-    function viewPoolVestingInformation(uint256 _pid)
-        external
-        view
-        returns (
-            uint256,
-            uint256,
-            uint256,
-            uint256
-        );
+    function viewPoolVestingInformation(
+        uint256 _pid
+    ) external view returns (uint256, uint256, uint256, uint256);
 
-    function viewPoolTaxRateOverflow(uint256 _pid) external view returns (uint256);
+    function viewPoolTaxRateOverflow(
+        uint256 _pid
+    ) external view returns (uint256);
 
-    function viewUserAllocationPools(address _user, uint8[] calldata _pids) external view returns (uint256[] memory);
+    function viewUserAllocationPools(
+        address _user,
+        uint8[] calldata _pids
+    ) external view returns (uint256[] memory);
 
-    function viewUserInfo(address _user, uint8[] calldata _pids)
-        external
-        view
-        returns (uint256[] memory, bool[] memory);
+    function viewUserInfo(
+        address _user,
+        uint8[] calldata _pids
+    ) external view returns (uint256[] memory, bool[] memory);
 
-    function viewUserOfferingAndRefundingAmountsForPools(address _user, uint8[] calldata _pids)
-        external
-        view
-        returns (uint256[3][] memory);
+    function viewUserOfferingAndRefundingAmountsForPools(
+        address _user,
+        uint8[] calldata _pids
+    ) external view returns (uint256[3][] memory);
 }

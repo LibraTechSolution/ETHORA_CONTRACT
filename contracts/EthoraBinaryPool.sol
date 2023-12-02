@@ -32,14 +32,17 @@ contract EthoraBinaryPool is
     mapping(address => bool) public isHandler;
     mapping(address => ProvidedLiquidity) public liquidityPerUser;
 
-    function initialize(address _tokenX, uint32 _lockupPeriod) external initializer{
+    function initialize(
+        address _tokenX,
+        uint32 _lockupPeriod
+    ) external initializer {
         __ERC20_init("Ethora LP Token", "ELP");
         ACCURACY = 1e3;
         INITIAL_RATE = 1;
         OPTION_ISSUER_ROLE = keccak256("OPTION_ISSUER_ROLE");
         tokenX = ERC20Upgradeable(_tokenX);
         owner = msg.sender;
-        maxLiquidity = 5000000 * 10**tokenX.decimals();
+        maxLiquidity = 5000000 * 10 ** tokenX.decimals();
         lockupPeriod = _lockupPeriod;
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
@@ -51,34 +54,29 @@ contract EthoraBinaryPool is
     /**
      * @notice Used for adding or removing handlers
      */
-    function setHandler(address _handler, bool _isActive)
-        external
-        onlyRole(DEFAULT_ADMIN_ROLE)
-    {
+    function setHandler(
+        address _handler,
+        bool _isActive
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
         isHandler[_handler] = _isActive;
     }
 
-    function setTokenX(address token_) 
-        external
-        onlyRole(DEFAULT_ADMIN_ROLE)
-    {
+    function setTokenX(address token_) external onlyRole(DEFAULT_ADMIN_ROLE) {
         tokenX = ERC20Upgradeable(token_);
     }
 
-    function setLockupPeriod(uint32 period_) 
-        external
-        onlyRole(DEFAULT_ADMIN_ROLE)
-    {
+    function setLockupPeriod(
+        uint32 period_
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
         lockupPeriod = period_;
     }
 
     /**
      * @notice Used for adjusting the max limit of the pool
      */
-    function setMaxLiquidity(uint256 _maxLiquidity)
-        external
-        onlyRole(DEFAULT_ADMIN_ROLE)
-    {
+    function setMaxLiquidity(
+        uint256 _maxLiquidity
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
         require(
             _maxLiquidity > totalTokenXBalance(),
             "Invalid new maxLiquidity"
@@ -122,10 +120,10 @@ contract EthoraBinaryPool is
                       Calling the provide function will require the minimum amount of tokens to be minted.
                       The actual amount that will be minted could vary but can only be higher (not lower) than the minimum value.
      */
-    function provide(uint256 tokenXAmount, uint256 minMint)
-        external
-        returns (uint256 mint)
-    {
+    function provide(
+        uint256 tokenXAmount,
+        uint256 minMint
+    ) external returns (uint256 mint) {
         mint = _provide(tokenXAmount, minMint, msg.sender);
     }
 
@@ -151,10 +149,10 @@ contract EthoraBinaryPool is
     /**
      * @notice Called by the Handler to burns ELP and receives X for a user
      */
-    function withdrawForAccount(uint256 tokenXAmount, address account)
-        external
-        returns (uint256 burn)
-    {
+    function withdrawForAccount(
+        uint256 tokenXAmount,
+        address account
+    ) external returns (uint256 burn) {
         _validateHandler();
         burn = _withdraw(tokenXAmount, account);
     }
@@ -273,7 +271,9 @@ contract EthoraBinaryPool is
         liquidityPerUser[account].nextIndexForUnlock = nextIndexForUnlock;
     }
 
-    function _getUnlockedLiquidity(address account)
+    function _getUnlockedLiquidity(
+        address account
+    )
         internal
         view
         returns (uint256 unlockedAmount, uint256 nextIndexForUnlock)
@@ -303,10 +303,10 @@ contract EthoraBinaryPool is
         require(isHandler[msg.sender], "Pool: forbidden");
     }
 
-    function _withdraw(uint256 tokenXAmount, address account)
-        internal
-        returns (uint256 burn)
-    {
+    function _withdraw(
+        uint256 tokenXAmount,
+        address account
+    ) internal returns (uint256 burn) {
         require(
             tokenXAmount <= availableBalance(),
             "Pool: Not enough funds on the pool contract. Please lower the amount."
@@ -393,11 +393,9 @@ contract EthoraBinaryPool is
     /**
      * @dev Returns available liquidity
      */
-    function getUnlockedLiquidity(address account)
-        external
-        view
-        returns (uint256 unlockedAmount)
-    {
+    function getUnlockedLiquidity(
+        address account
+    ) external view returns (uint256 unlockedAmount) {
         (unlockedAmount, ) = _getUnlockedLiquidity(account);
     }
 
@@ -435,6 +433,6 @@ contract EthoraBinaryPool is
         if (a % b != 0) c = c + 1;
         return c;
     }
-    
+
     uint256[47] private __gap;
 }

@@ -29,7 +29,7 @@ contract EthoraRouter is AccessControlUpgradeable, IEthoraRouter {
     mapping(address => bool) public isKeeper;
     mapping(bytes => bool) public prevSignature;
     mapping(address => mapping(uint256 => OptionInfo)) public optionIdMapping;
-    mapping(address => bool) public override tradeds; 
+    mapping(address => bool) public override tradeds;
 
     function initialize(
         address _publisher,
@@ -60,16 +60,14 @@ contract EthoraRouter is AccessControlUpgradeable, IEthoraRouter {
     }
 
     function setPublisher(
-        address _publisher, 
+        address _publisher,
         address _sfPublisher
     ) external onlyRole(DEFAULT_ADMIN_ROLE) {
         publisher = _publisher;
         sfPublisher = _sfPublisher;
     }
 
-    function setAdmin(
-        address _admin
-    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    function setAdmin(address _admin) external onlyRole(DEFAULT_ADMIN_ROLE) {
         admin = _admin;
     }
 
@@ -124,7 +122,9 @@ contract EthoraRouter is AccessControlUpgradeable, IEthoraRouter {
     function revokeApprovals(RevokeParams[] memory revokeParams) public {
         for (uint256 index = 0; index < revokeParams.length; index++) {
             RevokeParams memory params = revokeParams[index];
-            IERC20PermitUpgradeable token = IERC20PermitUpgradeable(params.tokenX);
+            IERC20PermitUpgradeable token = IERC20PermitUpgradeable(
+                params.tokenX
+            );
             uint256 nonceBefore = token.nonces(params.user);
             try
                 token.permit(
@@ -165,7 +165,9 @@ contract EthoraRouter is AccessControlUpgradeable, IEthoraRouter {
             IEthoraBinaryOptions optionsContract = IEthoraBinaryOptions(
                 currentParams.targetContract
             );
-            ERC20Upgradeable tokenX = ERC20Upgradeable(optionsContract.tokenX());
+            ERC20Upgradeable tokenX = ERC20Upgradeable(
+                optionsContract.tokenX()
+            );
             Permit memory permit = params[index].permit;
             uint256 amountToPay = currentParams.totalFee +
                 IOptionsConfig(optionsContract.config()).platformFee();
@@ -571,8 +573,7 @@ contract EthoraRouter is AccessControlUpgradeable, IEthoraRouter {
             allowPartialFill: params.allowPartialFill,
             totalFee: revisedFee,
             referralCode: params.referralCode,
-            // traderNFTId: params.traderNFTId,
-            settlementFee: params.settlementFee, 
+            settlementFee: params.settlementFee,
             isLimitOrder: params.isLimitOrder,
             isTradeResolved: true,
             optionId: optionId,
@@ -585,7 +586,14 @@ contract EthoraRouter is AccessControlUpgradeable, IEthoraRouter {
         });
         prevSignature[params.userSignInfo.signature] = true;
 
-        emit OpenTrade(user, params.queueId, optionId, params.targetContract, expiration, revisedFee);
+        emit OpenTrade(
+            user,
+            params.queueId,
+            optionId,
+            params.targetContract,
+            expiration,
+            revisedFee
+        );
     }
 
     function getId() external view returns (uint256) {

@@ -20,7 +20,7 @@ contract Whitelist is OwnableUpgradeable {
 
     function __Whitelist_init() internal onlyInitializing {
         __Ownable_init();
-    }    
+    }
 
     /**
      * @dev add single address to whitelist
@@ -33,7 +33,9 @@ contract Whitelist is OwnableUpgradeable {
     /**
      * @dev add addresses to whitelist
      */
-    function addAddressesToWhitelist(address[] calldata _users) external onlyOwner {
+    function addAddressesToWhitelist(
+        address[] calldata _users
+    ) external onlyOwner {
         for (uint256 i = 0; i < _users.length; i++) {
             whitelist[_users[i]] = true;
             emit WhitelistedAddressAdded(_users[i]);
@@ -51,7 +53,9 @@ contract Whitelist is OwnableUpgradeable {
     /**
      * @dev remove addresses from whitelist
      */
-    function removeAddressesFromWhitelist(address[] calldata _users) external onlyOwner {
+    function removeAddressesFromWhitelist(
+        address[] calldata _users
+    ) external onlyOwner {
         for (uint256 i = 0; i < _users.length; i++) {
             whitelist[_users[i]] = false;
             emit WhitelistedAddressRemoved(_users[i]);
