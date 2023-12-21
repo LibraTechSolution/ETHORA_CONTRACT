@@ -7,7 +7,6 @@ import "./library/Validator.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 /**
- * @author Heisenberg
  * @notice Ethora Options Router Contract
  */
 contract AccountRegistrar is IAccountRegistrar, AccessControl {

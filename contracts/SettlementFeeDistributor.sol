@@ -7,7 +7,6 @@ import "./interfaces/interfaces.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
 /**
- * @author Heisenberg
  * @title Buffer SettlementFeeDistributor
  * @notice Distributes the SettlementFee Collected by the Buffer Protocol
  */

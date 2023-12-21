@@ -6,7 +6,6 @@ import "@openzeppelin/contracts/access/Ownable2Step.sol";
 import "./interfaces/interfaces.sol";
 
 /**
- * @author Heisenberg
  * @title Referral Storage
  * @notice Contains referral Logic for option buying
  */

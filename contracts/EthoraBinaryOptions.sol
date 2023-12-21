@@ -9,7 +9,6 @@ import "./interfaces/interfaces.sol";
 import "./library/OptionMath.sol";
 
 /**
- * @author Heisenberg
  * @title Ethora Options
  */
 

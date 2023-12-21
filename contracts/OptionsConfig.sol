@@ -6,7 +6,6 @@ import "./EthoraBinaryPool.sol";
 import "@openzeppelin/contracts/access/Ownable2Step.sol";
 
 /**
- * @author Heisenberg
  * @title Ethora Options Config
  * @notice Maintains all the configurations for the options contracts
  */

@@ -7,7 +7,6 @@ import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 
 /**
- * @author Heisenberg
  * @title Ethora TokenX Liquidity Pool
  * @notice Accumulates liquidity in TokenX from LPs and distributes P&L in TokenX
  */

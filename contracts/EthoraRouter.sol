@@ -11,7 +11,6 @@ import "@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.
 import "./library/Validator.sol";
 
 /**
- * @author Heisenberg
  * @notice Ethora Options Router Contract
  */
 contract EthoraRouter is AccessControlUpgradeable, IEthoraRouter {
