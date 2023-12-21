@@ -2,9 +2,9 @@
 pragma solidity ^0.8.4;
 
 import "./interfaces/interfaces.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable2Step.sol";
 
-contract MarketOIConfig is Ownable {
+contract MarketOIConfig is Ownable2Step {
     uint256 public _maxMarketOI;
     uint256 public _maxTradeSize;
     IEthoraBinaryOptions public _marketContract;

@@ -10,7 +10,7 @@ contract PoolOIStorage is AccessControl {
     event UpdatePoolOI(bool isIncreased, uint256 interest);
 
     constructor() {
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
     function updatePoolOI(

@@ -4,6 +4,7 @@ pragma solidity ^0.8.4;
 
 contract Governable {
     address public gov;
+    address public pendingGov;
 
     constructor() {
         gov = msg.sender;
@@ -14,7 +15,14 @@ contract Governable {
         _;
     }
 
-    function setGov(address _gov) external onlyGov {
-        gov = _gov;
+    function setPendingGov(address _gov) external onlyGov {
+        pendingGov = _gov;
+    }
+
+    function acceptGov() external {
+        address account = msg.sender;
+        require(account == pendingGov, "Governable: caller is not pending gov");
+        delete pendingGov;
+        gov = account;
     }
 }

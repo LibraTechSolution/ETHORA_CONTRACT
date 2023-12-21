@@ -161,7 +161,7 @@ contract BaseToken is IERC20, IBaseToken {
     function allowance(
         address _owner,
         address _spender
-    ) external view override returns (uint256) {
+    ) public view override returns (uint256) {
         return allowances[_owner][_spender];
     }
 
@@ -182,13 +182,21 @@ contract BaseToken is IERC20, IBaseToken {
             _transfer(_sender, _recipient, _amount);
             return true;
         }
-        uint256 nextAllowance = allowances[_sender][msg.sender].sub(
-            _amount,
-            "BaseToken: transfer amount exceeds allowance"
-        );
-        _approve(_sender, msg.sender, nextAllowance);
+        _spendAllowance(_sender, msg.sender, _amount);
         _transfer(_sender, _recipient, _amount);
         return true;
+    }
+
+    function _spendAllowance(address owner, address spender, uint256 value) internal {
+        uint256 currentAllowance = allowance(owner, spender);
+        if (currentAllowance != type(uint256).max) {
+            if (currentAllowance < value) {
+                revert ("BaseToken: exceeds allowance");
+            }
+            unchecked {
+                _approve(owner, spender, currentAllowance - value);
+            }
+        }
     }
 
     function _mint(address _account, uint256 _amount) internal {

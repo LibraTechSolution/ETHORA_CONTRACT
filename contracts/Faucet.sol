@@ -3,9 +3,9 @@ pragma solidity ^0.8.4;
 // SPDX-License-Identifier: BUSL-1.1
 
 import "./USDC.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable2Step.sol";
 
-contract Faucet is Ownable {
+contract Faucet is Ownable2Step {
     USDC public token;
     uint256 public amount;
     uint256 public startTimestamp;

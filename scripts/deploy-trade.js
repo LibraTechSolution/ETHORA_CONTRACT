@@ -90,10 +90,10 @@ async function main() {
   await moic.deployed();
   console.log("MarketOIConfig address:", moic.address);
 
-  let Booster = await ethers.getContractFactory('Booster')
-  let booster = await upgrades.deployProxy(Booster, [], {initializer: "initialize"})
-  await booster.deployed();
-  console.log("Booster address:", booster.address);
+  // let Booster = await ethers.getContractFactory('Booster')
+  // let booster = await upgrades.deployProxy(Booster, [], {initializer: "initialize"})
+  // await booster.deployed();
+  // console.log("Booster address:", booster.address);
 
 //   await booster.setBoostPercentage(0)
   
@@ -109,9 +109,9 @@ async function main() {
   console.log(1);
   await sleep(4000);
 
-  await ocg.setBoosterContract(booster.address);
-  console.log(2);
-  await sleep(4000);
+  // await ocg.setBoosterContract(booster.address);
+  // console.log(2);
+  // await sleep(4000);
 
   await ocg.setMinFee(ethers.BigNumber.from("5000000"));
   console.log(3);

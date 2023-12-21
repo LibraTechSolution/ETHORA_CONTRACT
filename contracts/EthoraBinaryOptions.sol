@@ -49,7 +49,7 @@ contract EthoraBinaryOptions is
         IV_ROLE = keccak256("ROUTER_ROLE");
         ivFactorITM = 1e3;
         ivFactorOTM = 50;
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
     /************************************************
@@ -80,7 +80,7 @@ contract EthoraBinaryOptions is
         assetCategory = _category;
         token0 = _token0;
         token1 = _token1;
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         emit CreateOptionsContract(
             address(config),
             address(pool),
@@ -161,12 +161,6 @@ contract EthoraBinaryOptions is
         );
 
         pool.lock(optionID, option.lockedAmount, option.premium);
-        IBooster booster = IBooster(config.boosterContract());
-        if (
-            booster.getBoostPercentage(optionParams.user, address(tokenX)) > 0
-        ) {
-            booster.updateUserBoost(optionParams.user, address(tokenX));
-        }
         IOptionStorage(config.optionStorageContract()).save(
             optionID,
             address(this),
@@ -490,11 +484,7 @@ contract EthoraBinaryOptions is
         uint256 referralDiscount = _getReferralDiscount(referrer, user);
         settlementFeePercentage =
             settlementFeePercentage -
-            referralDiscount -
-            IBooster(config.boosterContract()).getBoostPercentage(
-                user,
-                address(tokenX)
-            );
+            referralDiscount;
     }
 
     function approveAddress(

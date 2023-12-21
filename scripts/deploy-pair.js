@@ -116,9 +116,9 @@ async function main() {
   console.log(1);
   await sleep(4000);
 
-  await ocg.setBoosterContract("0x8A34e11E73c2C1A7F97db4f1e960ED8aC4a4B004");
-  console.log(2);
-  await sleep(4000);
+  // await ocg.setBoosterContract("0x8A34e11E73c2C1A7F97db4f1e960ED8aC4a4B004");
+  // console.log(2);
+  // await sleep(4000);
 
   await ocg.setMinFee(ethers.BigNumber.from("5000000"));
   console.log(3);

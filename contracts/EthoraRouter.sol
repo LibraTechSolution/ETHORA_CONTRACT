@@ -43,7 +43,7 @@ contract EthoraRouter is AccessControlUpgradeable, IEthoraRouter {
         accountRegistrar = IAccountRegistrar(_accountRegistrar);
         MAX_DELAY_FOR_OPEN_TRADE = 1 minutes;
         MAX_DELAY_FOR_ASSET_PRICE = 1 minutes;
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
     /************************************************
@@ -514,7 +514,7 @@ contract EthoraRouter is AccessControlUpgradeable, IEthoraRouter {
         }
         return (true, "");
     }
-
+ 
     function _openTrade(
         TradeParams memory params,
         address user,
