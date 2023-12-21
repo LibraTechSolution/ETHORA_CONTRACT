@@ -161,11 +161,7 @@ contract EthoraBinaryOptions is
         );
 
         pool.lock(optionID, option.lockedAmount, option.premium);
-        IOptionStorage(config.optionStorageContract()).save(
-            optionID,
-            address(this),
-            optionParams.user
-        );
+        emit Save(optionID, address(this), optionParams.user);
         totalMarketOI += optionParams.totalFee;
         IPoolOIStorage(config.poolOIStorageContract()).updatePoolOI(
             true,

@@ -186,6 +186,11 @@ interface IEthoraBinaryOptions {
         uint256 rebate,
         string referralCode
     );
+    event Save(
+        uint256 optionId,
+        address optionsContract,
+        address user
+    );
 
     event LpProfit(uint256 indexed id, uint256 amount);
     event LpLoss(uint256 indexed id, uint256 amount);
@@ -344,7 +349,6 @@ interface IOptionsConfig {
     event UpdateSettlementFeeDisbursalContract(address value);
     event UpdatetraderNFTContract(address value);
     event UpdateMinFee(uint256 value);
-    event UpdateOptionStorageContract(address value);
     event UpdateCreationWindowContract(address value);
     event UpdatePlatformFee(uint256 _platformFee);
     event UpdatePoolOIStorageContract(address _poolOIStorageContract);
@@ -361,8 +365,6 @@ interface IOptionsConfig {
     function minFee() external view returns (uint256);
 
     function platformFee() external view returns (uint256);
-
-    function optionStorageContract() external view returns (address);
 
     function creationWindowContract() external view returns (address);
 
@@ -451,14 +453,6 @@ interface IReferralStorage {
         address newAccount,
         string code
     );
-}
-
-interface IOptionStorage {
-    function save(
-        uint256 optionId,
-        address optionsContract,
-        address user
-    ) external;
 }
 
 interface ICreationWindowContract {

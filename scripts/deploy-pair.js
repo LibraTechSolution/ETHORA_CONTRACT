@@ -68,11 +68,6 @@ async function main() {
   await ocg.deployed();
   console.log("OptionsConfig address:", ocg.address);
 
-//   let Osg = await ethers.getContractFactory('OptionStorage')
-//   let osg = await Osg.deploy()
-//   await osg.deployed();
-//   console.log("OptionStorage address:", osg.address);
-
   let POIS = await ethers.getContractFactory('PoolOIStorage')
   let pois = await POIS.attach("0x8F804E6a6d3050C223A27c4Be63F3b81eb1293d5")
 //   let pois = await POIS.deploy()
@@ -134,10 +129,6 @@ async function main() {
 
   await ocg.setSettlementFeeDisbursalContract("0x771BEC2Da006C1f2D1FcFBA4BDF8981B16e206c1");
   console.log(6);
-  await sleep(4000);
-
-  await ocg.setOptionStorageContract("0xBb5d868b294541538b622D5744ff69F6368a0456");
-  console.log(7);
   await sleep(4000);
 
   await ocg.setMaxPeriod(14400);

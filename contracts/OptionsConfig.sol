@@ -12,9 +12,8 @@ import "@openzeppelin/contracts/access/Ownable2Step.sol";
  */
 contract OptionsConfig is Ownable2Step, IOptionsConfig {
     EthoraBinaryPool public pool;
-
+ 
     address public override settlementFeeDisbursalContract;
-    address public override optionStorageContract;
     address public override creationWindowContract;
     address public override poolOIStorageContract;
     address public override poolOIConfigContract;
@@ -65,13 +64,6 @@ contract OptionsConfig is Ownable2Step, IOptionsConfig {
         emit UpdateSettlementFeeDisbursalContract(
             _settlementFeeDisbursalContract
         );
-    }
-
-    function setOptionStorageContract(
-        address _optionStorageContract
-    ) external onlyOwner {
-        optionStorageContract = _optionStorageContract;
-        emit UpdateOptionStorageContract(_optionStorageContract);
     }
 
     function setMaxPeriod(uint32 _maxPeriod) external onlyOwner {
