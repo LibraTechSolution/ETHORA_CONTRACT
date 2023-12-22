@@ -190,9 +190,7 @@ contract BaseToken is IERC20, IBaseToken {
     function _spendAllowance(address owner, address spender, uint256 value) internal {
         uint256 currentAllowance = allowance(owner, spender);
         if (currentAllowance != type(uint256).max) {
-            if (currentAllowance < value) {
-                revert ("BaseToken: exceeds allowance");
-            }
+            require(currentAllowance >= value, "BaseToken: exceeds allowance");
             unchecked {
                 _approve(owner, spender, currentAllowance - value);
             }
