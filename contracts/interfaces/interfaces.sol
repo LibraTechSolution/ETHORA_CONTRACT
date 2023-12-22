@@ -3,46 +3,6 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 
 pragma solidity ^0.8.4;
 
-interface IBooster {
-    struct UserBoostTrades {
-        uint256 totalBoostTrades;
-        uint256 totalBoostTradesUsed;
-    }
-
-    function getUserBoostData(
-        address user,
-        address token
-    ) external view returns (UserBoostTrades memory);
-
-    function updateUserBoost(address user, address token) external;
-
-    function getBoostPercentage(
-        address user,
-        address token
-    ) external view returns (uint256);
-
-    struct Permit {
-        uint256 value;
-        uint256 deadline;
-        uint8 v;
-        bytes32 r;
-        bytes32 s;
-        bool shouldApprove;
-    }
-    event ApproveTokenX(
-        address user,
-        uint256 nonce,
-        uint256 value,
-        uint256 deadline,
-        address tokenX
-    );
-    event BuyCoupon(address indexed token, address indexed user, uint256 price);
-    event SetPrice(uint256 couponPrice);
-    event SetBoostPercentage(uint256 boost);
-    event UpdateBoostTradesUser(address indexed user, address indexed token);
-    event Configure(uint8[4] nftTierDiscounts);
-}
-
 interface IAccountRegistrar {
     struct AccountMapping {
         address oneCT;
@@ -226,6 +186,11 @@ interface IEthoraBinaryOptions {
         uint256 rebate,
         string referralCode
     );
+    event Save(
+        uint256 optionId,
+        address optionsContract,
+        address user
+    );
 
     event LpProfit(uint256 indexed id, uint256 amount);
     event LpLoss(uint256 indexed id, uint256 amount);
@@ -384,14 +349,12 @@ interface IOptionsConfig {
     event UpdateSettlementFeeDisbursalContract(address value);
     event UpdatetraderNFTContract(address value);
     event UpdateMinFee(uint256 value);
-    event UpdateOptionStorageContract(address value);
     event UpdateCreationWindowContract(address value);
     event UpdatePlatformFee(uint256 _platformFee);
     event UpdatePoolOIStorageContract(address _poolOIStorageContract);
     event UpdatePoolOIConfigContract(address _poolOIConfigContract);
     event UpdateMarketOIConfigContract(address _marketOIConfigContract);
     event UpdateIV(uint256 _iv);
-    event UpdateBoosterContract(address _boosterContract);
 
     function settlementFeeDisbursalContract() external view returns (address);
 
@@ -402,8 +365,6 @@ interface IOptionsConfig {
     function minFee() external view returns (uint256);
 
     function platformFee() external view returns (uint256);
-
-    function optionStorageContract() external view returns (address);
 
     function creationWindowContract() external view returns (address);
 
@@ -418,8 +379,6 @@ interface IOptionsConfig {
     function earlyCloseThreshold() external view returns (uint32);
 
     function isEarlyCloseAllowed() external view returns (bool);
-
-    function boosterContract() external view returns (address);
 }
 
 interface ITraderNFT {
@@ -494,14 +453,6 @@ interface IReferralStorage {
         address newAccount,
         string code
     );
-}
-
-interface IOptionStorage {
-    function save(
-        uint256 optionId,
-        address optionsContract,
-        address user
-    ) external;
 }
 
 interface ICreationWindowContract {

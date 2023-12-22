@@ -2,24 +2,21 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable2Step.sol";
 import "./interfaces/interfaces.sol";
 
 /**
- * @author Heisenberg
  * @title Referral Storage
  * @notice Contains referral Logic for option buying
  */
-contract ReferralStorage is IReferralStorage, Ownable {
+contract ReferralStorage is IReferralStorage, Ownable2Step {
     IEthoraRouter public router;
     mapping(address => uint8) public override referrerTier; // link between user <> tier
-    mapping(uint8 => Tier) public tiers;
     mapping(uint8 => uint8) public override referrerTierStep;
     mapping(uint8 => uint32) public override referrerTierDiscount;
     mapping(string => address) public override codeOwner;
     mapping(address => string) public userCode;
     mapping(address => string) public override traderReferralCodes;
-    mapping(address => ReferralData) public UserReferralData;
     mapping(address => bool) public operators;
 
     constructor(address router_) {

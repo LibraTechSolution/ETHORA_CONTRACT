@@ -3,23 +3,20 @@ pragma solidity ^0.8.4;
 // SPDX-License-Identifier: BUSL-1.1
 
 import "./EthoraBinaryPool.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable2Step.sol";
 
 /**
- * @author Heisenberg
  * @title Ethora Options Config
  * @notice Maintains all the configurations for the options contracts
  */
-contract OptionsConfig is Ownable, IOptionsConfig {
+contract OptionsConfig is Ownable2Step, IOptionsConfig {
     EthoraBinaryPool public pool;
-
+ 
     address public override settlementFeeDisbursalContract;
-    address public override optionStorageContract;
     address public override creationWindowContract;
     address public override poolOIStorageContract;
     address public override poolOIConfigContract;
     address public override marketOIConfigContract;
-    address public override boosterContract;
     uint32 public override maxPeriod = 24 hours;
     uint32 public override minPeriod = 3 minutes;
     uint32 public override earlyCloseThreshold = 1 minutes;
@@ -27,7 +24,7 @@ contract OptionsConfig is Ownable, IOptionsConfig {
     uint256 public override minFee = 1e6;
     uint256 public override iv;
     uint256 public override platformFee = 1e5;
-    bool public override isEarlyCloseAllowed;
+    bool public override isEarlyCloseAllowed; 
 
     constructor(address _pool) {
         pool = EthoraBinaryPool(_pool);
@@ -35,11 +32,6 @@ contract OptionsConfig is Ownable, IOptionsConfig {
 
     function setPool(address _pool) external onlyOwner {
         pool = EthoraBinaryPool(_pool);
-    }
-
-    function setBoosterContract(address _boosterContract) external onlyOwner {
-        boosterContract = _boosterContract;
-        emit UpdateBoosterContract(_boosterContract);
     }
 
     function setCreationWindowContract(
@@ -71,13 +63,6 @@ contract OptionsConfig is Ownable, IOptionsConfig {
         emit UpdateSettlementFeeDisbursalContract(
             _settlementFeeDisbursalContract
         );
-    }
-
-    function setOptionStorageContract(
-        address _optionStorageContract
-    ) external onlyOwner {
-        optionStorageContract = _optionStorageContract;
-        emit UpdateOptionStorageContract(_optionStorageContract);
     }
 
     function setMaxPeriod(uint32 _maxPeriod) external onlyOwner {

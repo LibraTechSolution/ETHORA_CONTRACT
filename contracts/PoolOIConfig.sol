@@ -2,9 +2,9 @@
 pragma solidity ^0.8.4;
 
 import "./interfaces/interfaces.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable2Step.sol";
 
-contract PoolOIConfig is Ownable {
+contract PoolOIConfig is Ownable2Step {
     uint256 public _maxPoolOI;
     IPoolOIStorage public _poolOIStorage;
 

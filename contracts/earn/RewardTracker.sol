@@ -159,7 +159,7 @@ contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
     function allowance(
         address _owner,
         address _spender
-    ) external view override returns (uint256) {
+    ) public view override returns (uint256) {
         return allowances[_owner][_spender];
     }
 
@@ -180,14 +180,19 @@ contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
             _transfer(_sender, _recipient, _amount);
             return true;
         }
-
-        uint256 nextAllowance = allowances[_sender][msg.sender].sub(
-            _amount,
-            "RewardTracker: transfer amount exceeds allowance"
-        );
-        _approve(_sender, msg.sender, nextAllowance);
+        _spendAllowance(_sender, msg.sender, _amount);
         _transfer(_sender, _recipient, _amount);
         return true;
+    }
+
+    function _spendAllowance(address owner, address spender, uint256 value) internal {
+        uint256 currentAllowance = allowance(owner, spender);
+        if (currentAllowance != type(uint256).max) {
+            require(currentAllowance >= value, "RewardTracker: transfer amount exceeds allowance");
+            unchecked {
+                _approve(owner, spender, currentAllowance - value);
+            }
+        }
     }
 
     function tokensPerInterval() external view override returns (uint256) {

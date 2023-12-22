@@ -7,7 +7,6 @@ import "./interfaces/interfaces.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
 /**
- * @author Heisenberg
  * @title Buffer SettlementFeeDistributor
  * @notice Distributes the SettlementFee Collected by the Buffer Protocol
  */
@@ -29,7 +28,7 @@ contract SettlementFeeDistributor is AccessControlUpgradeable {
 
     function initialize(ERC20Upgradeable _tokenX) external initializer {
         tokenX = _tokenX;
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
     // All percentages are with a factor of e2

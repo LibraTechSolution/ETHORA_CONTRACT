@@ -63,11 +63,6 @@ async function main() {
   await ocg.deployed();
   console.log("OptionsConfig address:", ocg.address);
 
-  let Osg = await ethers.getContractFactory('OptionStorage')
-  let osg = await Osg.deploy()
-  await osg.deployed();
-  console.log("OptionStorage address:", osg.address);
-
   let POIS = await ethers.getContractFactory('PoolOIStorage')
   let pois = await POIS.deploy()
   await pois.deployed();
@@ -90,10 +85,10 @@ async function main() {
   await moic.deployed();
   console.log("MarketOIConfig address:", moic.address);
 
-  let Booster = await ethers.getContractFactory('Booster')
-  let booster = await upgrades.deployProxy(Booster, [], {initializer: "initialize"})
-  await booster.deployed();
-  console.log("Booster address:", booster.address);
+  // let Booster = await ethers.getContractFactory('Booster')
+  // let booster = await upgrades.deployProxy(Booster, [], {initializer: "initialize"})
+  // await booster.deployed();
+  // console.log("Booster address:", booster.address);
 
 //   await booster.setBoostPercentage(0)
   
@@ -109,9 +104,9 @@ async function main() {
   console.log(1);
   await sleep(4000);
 
-  await ocg.setBoosterContract(booster.address);
-  console.log(2);
-  await sleep(4000);
+  // await ocg.setBoosterContract(booster.address);
+  // console.log(2);
+  // await sleep(4000);
 
   await ocg.setMinFee(ethers.BigNumber.from("5000000"));
   console.log(3);
@@ -128,10 +123,6 @@ async function main() {
   // await ocg.setSettlementFeeDisbursalContract(deployer.address);
   // console.log(6);
   // await sleep(4000);
-
-  await ocg.setOptionStorageContract(osg.address);
-  console.log(7);
-  await sleep(4000);
 
   await ocg.setMaxPeriod(14400);
   console.log(8);

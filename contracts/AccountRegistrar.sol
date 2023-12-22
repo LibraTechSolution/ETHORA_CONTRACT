@@ -7,7 +7,6 @@ import "./library/Validator.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 /**
- * @author Heisenberg
  * @notice Ethora Options Router Contract
  */
 contract AccountRegistrar is IAccountRegistrar, AccessControl {
@@ -15,7 +14,7 @@ contract AccountRegistrar is IAccountRegistrar, AccessControl {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
 
     constructor() {
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
     function registerAccount(

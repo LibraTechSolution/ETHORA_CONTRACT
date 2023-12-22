@@ -5,10 +5,8 @@ pragma solidity ^0.8.4;
 import "./interfaces/interfaces.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 
 /**
- * @author Heisenberg
  * @title Ethora TokenX Liquidity Pool
  * @notice Accumulates liquidity in TokenX from LPs and distributes P&L in TokenX
  */
@@ -19,7 +17,6 @@ contract EthoraBinaryPool is
 {
     using SafeERC20Upgradeable for ERC20Upgradeable;
     ERC20Upgradeable public tokenX;
-    uint16 public ACCURACY;
     uint32 public INITIAL_RATE;
     uint32 public lockupPeriod;
     uint256 public lockedAmount;
@@ -37,14 +34,13 @@ contract EthoraBinaryPool is
         uint32 _lockupPeriod
     ) external initializer {
         __ERC20_init("Ethora LP Token", "ELP");
-        ACCURACY = 1e3;
         INITIAL_RATE = 1;
         OPTION_ISSUER_ROLE = keccak256("OPTION_ISSUER_ROLE");
         tokenX = ERC20Upgradeable(_tokenX);
         owner = msg.sender;
         maxLiquidity = 5000000 * 10 ** tokenX.decimals();
         lockupPeriod = _lockupPeriod;
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
     /************************************************
@@ -103,12 +99,14 @@ contract EthoraBinaryPool is
         }
 
         uint256 currentAllowance = allowance(_sender, msg.sender);
-        require(
-            currentAllowance >= _amount,
-            "Pool: transfer amount exceeds allowance"
-        );
-        unchecked {
-            _approve(_sender, msg.sender, currentAllowance - _amount);
+        if (currentAllowance != type(uint256).max) {
+            require(
+                currentAllowance >= _amount,
+                "Pool: transfer amount exceeds allowance"
+            );
+            unchecked {
+                _approve(_sender, msg.sender, currentAllowance - _amount);
+            }
         }
         _transfer(_sender, _recipient, _amount);
         return true;
