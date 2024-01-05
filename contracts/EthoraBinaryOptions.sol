@@ -97,14 +97,14 @@ contract EthoraBinaryOptions is
     /**
      * @notice Grants complete approval from the pool
      */
-    function approvePoolToTransferTokenX() public {
+    function approvePoolToTransferTokenX() external {
         tokenX.approve(address(pool), ~uint256(0));
     }
 
     /**
      * @notice Pauses/Unpauses the option creation
      */
-    function setIsPaused() public {
+    function setIsPaused() external {
         if (hasRole(PAUSER_ROLE, msg.sender)) {
             isPaused = true;
         } else if (hasRole(DEFAULT_ADMIN_ROLE, msg.sender)) {
@@ -119,6 +119,15 @@ contract EthoraBinaryOptions is
      *  ROUTER ONLY FUNCTIONS
      ***********************************************/
 
+    function transferFee(
+        address user,
+        address admin,
+        uint256 revisedFee
+    ) external override onlyRole(ROUTER_ROLE) {
+        tokenX.safeTransferFrom(user, admin, config.platformFee());
+        tokenX.safeTransferFrom(user, address(this), revisedFee);
+    }
+
     /**
      * @notice Creates an option with the specified parameters
      * @dev Can only be called by router
@@ -132,7 +141,7 @@ contract EthoraBinaryOptions is
             optionParams.strike,
             optionParams.amount,
             optionParams.amount,
-            optionParams.amount / 2,
+            optionParams.amount >> 1,
             queuedTime + optionParams.period,
             optionParams.totalFee,
             queuedTime
@@ -227,7 +236,7 @@ contract EthoraBinaryOptions is
         string calldata referralCode,
         uint256 baseSettlementFeePercentage
     )
-        public
+        external
         view
         override
         returns (uint256 total, uint256 settlementFee, uint256 premium)
@@ -266,7 +275,7 @@ contract EthoraBinaryOptions is
             );
     }
 
-    function getMaxOI() public view returns (uint256) {
+    function getMaxOI() external view returns (uint256) {
         return
             min(
                 IPoolOIConfig(config.poolOIConfigContract()).getPoolOICap(),
@@ -296,7 +305,7 @@ contract EthoraBinaryOptions is
         );
 
         uint256 maxTradeSize = getMaxTradeSize();
-        require(maxTradeSize > 0, "O36");
+        require(maxTradeSize != 0, "O36");
         revisedFee = min(optionParams.totalFee, maxTradeSize);
 
         if (revisedFee < optionParams.totalFee) {
@@ -420,7 +429,7 @@ contract EthoraBinaryOptions is
                 referral.referrerTierDiscount(
                     referral.referrerTier(referrer)
                 )) / (1e4 * 1e3));
-            if (referrerFee > 0) {
+            if (referrerFee != 0) {
                 tokenX.safeTransfer(referrer, referrerFee);
 
                 (uint256 formerUnitFee, , ) = _fees(
@@ -484,14 +493,14 @@ contract EthoraBinaryOptions is
 
     function approveAddress(
         address addressToApprove
-    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
         approvedAddresses[addressToApprove] = true;
     }
 
     function setToken(
         string memory _token0,
         string memory _token1
-    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
         token0 = _token0;
         token1 = _token1;
     }

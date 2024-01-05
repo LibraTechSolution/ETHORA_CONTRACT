@@ -818,7 +818,7 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
         address _holder,
         uint256 _index
     ) public pure returns (bytes32) {
-        return keccak256(abi.encodePacked(_holder, _index));
+        return keccak256(abi.encode(_holder, _index));
     }
 
     /**

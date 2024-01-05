@@ -102,7 +102,7 @@ contract EthoraBinaryPool is
         if (currentAllowance != type(uint256).max) {
             require(
                 currentAllowance >= _amount,
-                "Pool: transfer amount exceeds allowance"
+                "Pool: exceeds allowance"
             );
             unchecked {
                 _approve(_sender, msg.sender, currentAllowance - _amount);
@@ -207,8 +207,8 @@ contract EthoraBinaryPool is
         uint256 tokenXAmount
     ) external override onlyRole(OPTION_ISSUER_ROLE) {
         LockedLiquidity storage ll = lockedLiquidity[msg.sender][id];
-        require(ll.locked, "Pool: lockedAmount is already unlocked");
-        require(to != address(0));
+        require(ll.locked, "Pool: already unlocked");
+        require(to != address(0), "Pool: zero address");
 
         uint256 transferTokenXAmount = tokenXAmount > ll.amount
             ? ll.amount
@@ -238,7 +238,7 @@ contract EthoraBinaryPool is
 
         require(
             balance + tokenXAmount <= maxLiquidity,
-            "Pool has already reached it's max limit"
+            "reached max limit"
         );
 
         if (supply > 0 && balance > 0)
@@ -307,7 +307,7 @@ contract EthoraBinaryPool is
     ) internal returns (uint256 burn) {
         require(
             tokenXAmount <= availableBalance(),
-            "Pool: Not enough funds on the pool contract. Please lower the amount."
+            "Pool: Not enough funds"
         );
         uint256 totalSupply = totalSupply();
         uint256 balance = totalTokenXBalance();
@@ -325,7 +325,7 @@ contract EthoraBinaryPool is
 
         require(
             liquidityPerUser[account].unlockedAmount >= burn,
-            "Pool: Withdrawal amount is greater than current unlocked amount"
+            "Pool: exceed unlocked amount"
         );
         require(burn <= balanceOf(account), "Pool: Amount is too large");
         require(burn > 0, "Pool: Amount is too small");
@@ -339,7 +339,7 @@ contract EthoraBinaryPool is
 
     function _unlock(uint256 id) internal returns (uint256 premium) {
         LockedLiquidity storage ll = lockedLiquidity[msg.sender][id];
-        require(ll.locked, "Pool: lockedAmount is already unlocked");
+        require(ll.locked, "Pool: already unlocked");
         ll.locked = false;
 
         lockedPremium = lockedPremium - ll.premium;
@@ -356,7 +356,7 @@ contract EthoraBinaryPool is
             _updateLiquidity(from);
             require(
                 liquidityPerUser[from].unlockedAmount >= value,
-                "Pool: Transfer of funds in lock in period is blocked"
+                "Pool: in period is blocked"
             );
             liquidityPerUser[from].unlockedAmount -= value;
             if (to != address(0)) {
@@ -426,7 +426,7 @@ contract EthoraBinaryPool is
     }
 
     function divCeil(uint256 a, uint256 b) internal pure returns (uint256) {
-        require(b > 0);
+        require(b > 0, "Pool: undefined");
         uint256 c = a / b;
         if (a % b != 0) c = c + 1;
         return c;

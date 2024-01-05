@@ -30,7 +30,8 @@ library ABDKMath64x64 {
      */
     function fromInt(int256 x) internal pure returns (int128) {
         unchecked {
-            require(x >= -0x8000000000000000 && x <= 0x7FFFFFFFFFFFFFFF);
+            require(x >= -0x8000000000000000);
+            require(x <= 0x7FFFFFFFFFFFFFFF);
             return int128(x << 64);
         }
     }
@@ -86,7 +87,8 @@ library ABDKMath64x64 {
     function from128x128(int256 x) internal pure returns (int128) {
         unchecked {
             int256 result = x >> 64;
-            require(result >= MIN_64x64 && result <= MAX_64x64);
+            require(result >= MIN_64x64, "min");
+            require(result <= MAX_64x64, "max");
             return int128(result);
         }
     }

@@ -195,6 +195,12 @@ interface IEthoraBinaryOptions {
     event LpProfit(uint256 indexed id, uint256 amount);
     event LpLoss(uint256 indexed id, uint256 amount);
 
+     function transferFee(
+        address user,
+        address admin,
+        uint256 revisedFee
+    ) external;
+
     function createFromRouter(
         OptionParams calldata optionParams,
         uint256 queuedTime

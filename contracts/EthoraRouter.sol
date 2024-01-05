@@ -119,7 +119,8 @@ contract EthoraRouter is AccessControlUpgradeable, IEthoraRouter {
     }
 
     function revokeApprovals(RevokeParams[] memory revokeParams) public {
-        for (uint256 index = 0; index < revokeParams.length; index++) {
+        uint256 len = revokeParams.length;
+        for (uint256 index; index < len; index++) {
             RevokeParams memory params = revokeParams[index];
             IERC20PermitUpgradeable token = IERC20PermitUpgradeable(
                 params.tokenX
@@ -158,7 +159,8 @@ contract EthoraRouter is AccessControlUpgradeable, IEthoraRouter {
 
     function openTrades(OpenTxn[] calldata params) external {
         _validateKeeper();
-        for (uint32 index = 0; index < params.length; index++) {
+        uint256 len = params.length;
+        for (uint32 index; index < len; index++) {
             TradeParams memory currentParams = params[index].tradeParams;
             address user = params[index].user;
             IEthoraBinaryOptions optionsContract = IEthoraBinaryOptions(
@@ -229,7 +231,8 @@ contract EthoraRouter is AccessControlUpgradeable, IEthoraRouter {
 
     function closeAnytime(CloseAnytimeParams[] memory closeParams) external {
         _validateKeeper();
-        for (uint32 index = 0; index < closeParams.length; index++) {
+        uint256 len = closeParams.length;
+        for (uint32 index; index < len; index++) {
             CloseAnytimeParams memory closeParam = closeParams[index];
             CloseTradeParams memory params = closeParam.closeTradeParams;
             OptionInfo memory optionInfo = optionIdMapping[
@@ -549,11 +552,11 @@ contract EthoraRouter is AccessControlUpgradeable, IEthoraRouter {
 
         // Transfer the fee specified from the user to options contract.
         // User has to approve first inorder to execute this function
-        ERC20Upgradeable tokenX = ERC20Upgradeable(optionsContract.tokenX());
 
-        tokenX.safeTransferFrom(user, admin, config.platformFee());
-        tokenX.safeTransferFrom(user, params.targetContract, revisedFee);
-
+        try optionsContract.transferFee(user, admin, revisedFee) {
+        } catch Error(string memory reason) {
+            emit CancelTrade(user, params.queueId, reason);
+        }
         optionParams.strike = params.price;
         optionParams.amount = amount;
         optionParams.totalFee = revisedFee;
