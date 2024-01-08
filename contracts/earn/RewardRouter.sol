@@ -111,7 +111,7 @@ contract RewardRouter is ReentrancyGuardUpgradeable {
         uint256[] memory _amounts
     ) external nonReentrant onlyGov {
         address _etr = etr;
-        for (uint256 i = 0; i < _accounts.length; i++) {
+        for (uint256 i; i < _accounts.length; i++) {
             _stakeEtr(msg.sender, _accounts[i], _etr, _amounts[i]);
         }
     }
@@ -293,7 +293,7 @@ contract RewardRouter is ReentrancyGuardUpgradeable {
     function batchCompoundForAccounts(
         address[] memory _accounts
     ) external nonReentrant onlyGov {
-        for (uint256 i = 0; i < _accounts.length; i++) {
+        for (uint256 i; i < _accounts.length; i++) {
             _compound(_accounts[i]);
         }
     }

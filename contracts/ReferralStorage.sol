@@ -34,11 +34,11 @@ contract ReferralStorage is IReferralStorage, Ownable2Step {
         uint8[3] calldata _referrerTierStep,
         uint32[3] calldata _referrerTierDiscount // Factor of 1e5
     ) external onlyOwner {
-        for (uint8 i = 0; i < 3; i++) {
+        for (uint8 i; i < 3; i++) {
             referrerTierStep[i] = _referrerTierStep[i];
         }
 
-        for (uint8 i = 0; i < 3; i++) {
+        for (uint8 i; i < 3; i++) {
             referrerTierDiscount[i] = _referrerTierDiscount[i];
         }
     }

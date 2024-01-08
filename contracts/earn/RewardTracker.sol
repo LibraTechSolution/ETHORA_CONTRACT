@@ -56,7 +56,7 @@ contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
         address[] memory _depositTokens,
         address _distributor
     ) external onlyGov {
-        for (uint256 i = 0; i < _depositTokens.length; i++) {
+        for (uint256 i; i < _depositTokens.length; i++) {
             address depositToken = _depositTokens[i];
             isDepositToken[depositToken] = 1;
         }

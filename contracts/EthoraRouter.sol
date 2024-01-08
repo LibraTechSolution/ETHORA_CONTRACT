@@ -346,7 +346,7 @@ contract EthoraRouter is AccessControlUpgradeable, IEthoraRouter {
         _validateKeeper();
 
         uint32 arrayLength = uint32(optionData.length);
-        for (uint32 i = 0; i < arrayLength; i++) {
+        for (uint32 i; i < arrayLength; i++) {
             CloseTradeParams memory params = optionData[i];
             OptionInfo memory optionInfo = optionIdMapping[
                 params.targetContract

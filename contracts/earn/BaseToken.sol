@@ -118,14 +118,14 @@ contract BaseToken is IERC20, IBaseToken {
         address _account,
         address _receiver
     ) external onlyAdmin {
-        for (uint256 i = 0; i < yieldTrackers.length; i++) {
+        for (uint256 i; i < yieldTrackers.length; i++) {
             address yieldTracker = yieldTrackers[i];
             IYieldTracker(yieldTracker).claim(_account, _receiver);
         }
     }
 
     function claim(address _receiver) external {
-        for (uint256 i = 0; i < yieldTrackers.length; i++) {
+        for (uint256 i; i < yieldTrackers.length; i++) {
             address yieldTracker = yieldTrackers[i];
             IYieldTracker(yieldTracker).claim(msg.sender, _receiver);
         }
@@ -293,7 +293,7 @@ contract BaseToken is IERC20, IBaseToken {
     }
 
     function _updateRewards(address _account) private {
-        for (uint256 i = 0; i < yieldTrackers.length; i++) {
+        for (uint256 i; i < yieldTrackers.length; i++) {
             address yieldTracker = yieldTrackers[i];
             IYieldTracker(yieldTracker).updateRewards(_account);
         }

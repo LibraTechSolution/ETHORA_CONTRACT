@@ -36,7 +36,7 @@ contract Whitelist is Ownable2StepUpgradeable {
     function addAddressesToWhitelist(
         address[] calldata _users
     ) external onlyOwner {
-        for (uint256 i = 0; i < _users.length; i++) {
+        for (uint256 i; i < _users.length; i++) {
             whitelist[_users[i]] = 1;
             emit WhitelistedAddressAdded(_users[i]);
         }
@@ -56,7 +56,7 @@ contract Whitelist is Ownable2StepUpgradeable {
     function removeAddressesFromWhitelist(
         address[] calldata _users
     ) external onlyOwner {
-        for (uint256 i = 0; i < _users.length; i++) {
+        for (uint256 i; i < _users.length; i++) {
             delete whitelist[_users[i]];
             emit WhitelistedAddressRemoved(_users[i]);
         }
