@@ -43,7 +43,7 @@ contract Vester is IVester, IERC20Upgradeable, ReentrancyGuardUpgradeable {
     mapping(address => uint256) public override cumulativeRewardDeductions;
     mapping(address => uint256) public override bonusRewards;
 
-    mapping(address => bool) public isHandler;
+    mapping(address => uint256) public isHandler;
 
     event Claim(address receiver, uint256 amount);
     event Deposit(address account, uint256 amount);
@@ -86,7 +86,7 @@ contract Vester is IVester, IERC20Upgradeable, ReentrancyGuardUpgradeable {
         }
     }
 
-    function setHandler(address _handler, bool _isActive) external onlyGov {
+    function setHandler(address _handler, uint256 _isActive) external onlyGov {
         isHandler[_handler] = _isActive;
     }
 
@@ -501,6 +501,6 @@ contract Vester is IVester, IERC20Upgradeable, ReentrancyGuardUpgradeable {
     }
 
     function _validateHandler() private view {
-        require(isHandler[msg.sender], "Vester: forbidden");
+        require(isHandler[msg.sender] != 0, "Vester: forbidden");
     }
 }

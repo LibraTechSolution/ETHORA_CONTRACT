@@ -25,11 +25,11 @@ contract BaseToken is IERC20, IBaseToken {
     mapping(address => mapping(address => uint256)) public allowances;
 
     address[] public yieldTrackers;
-    mapping(address => bool) public nonStakingAccounts;
-    mapping(address => bool) public admins;
+    mapping(address => uint256) public nonStakingAccounts;
+    mapping(address => uint256) public admins;
 
     bool public inPrivateTransferMode;
-    mapping(address => bool) public isHandler;
+    mapping(address => uint256) public isHandler;
 
     modifier onlyGov() {
         require(msg.sender == gov, "BaseToken: forbidden");
@@ -37,7 +37,7 @@ contract BaseToken is IERC20, IBaseToken {
     }
 
     modifier onlyAdmin() {
-        require(admins[msg.sender], "BaseToken: forbidden");
+        require(admins[msg.sender] != 0, "BaseToken: forbidden");
         _;
     }
 
@@ -71,11 +71,11 @@ contract BaseToken is IERC20, IBaseToken {
     }
 
     function addAdmin(address _account) external onlyGov {
-        admins[_account] = true;
+        admins[_account] = 1;
     }
 
     function removeAdmin(address _account) external override onlyGov {
-        admins[_account] = false;
+        delete admins[_account];
     }
 
     // to help users who accidentally send their tokens to this contract
@@ -93,24 +93,24 @@ contract BaseToken is IERC20, IBaseToken {
         inPrivateTransferMode = _inPrivateTransferMode;
     }
 
-    function setHandler(address _handler, bool _isActive) external onlyGov {
+    function setHandler(address _handler, uint256 _isActive) external onlyGov {
         isHandler[_handler] = _isActive;
     }
 
     function addNonStakingAccount(address _account) external onlyAdmin {
         require(
-            !nonStakingAccounts[_account],
+            nonStakingAccounts[_account] == 0,
             "BaseToken: _account already marked"
         );
         _updateRewards(_account);
-        nonStakingAccounts[_account] = true;
+        nonStakingAccounts[_account] = 1;
         nonStakingSupply = nonStakingSupply.add(balances[_account]);
     }
 
     function removeNonStakingAccount(address _account) external onlyAdmin {
-        require(nonStakingAccounts[_account], "BaseToken: _account not marked");
+        require(nonStakingAccounts[_account] != 0, "BaseToken: _account not marked");
         _updateRewards(_account);
-        nonStakingAccounts[_account] = false;
+        delete nonStakingAccounts[_account];
         nonStakingSupply = nonStakingSupply.sub(balances[_account]);
     }
 
@@ -144,7 +144,7 @@ contract BaseToken is IERC20, IBaseToken {
     function stakedBalance(
         address _account
     ) external view override returns (uint256) {
-        if (nonStakingAccounts[_account]) {
+        if (nonStakingAccounts[_account] != 0) {
             return 0;
         }
         return balances[_account];
@@ -178,7 +178,7 @@ contract BaseToken is IERC20, IBaseToken {
         address _recipient,
         uint256 _amount
     ) external override returns (bool) {
-        if (isHandler[msg.sender]) {
+        if (isHandler[msg.sender] != 0) {
             _transfer(_sender, _recipient, _amount);
             return true;
         }
@@ -205,7 +205,7 @@ contract BaseToken is IERC20, IBaseToken {
         totalSupply = totalSupply.add(_amount);
         balances[_account] = balances[_account].add(_amount);
 
-        if (nonStakingAccounts[_account]) {
+        if (nonStakingAccounts[_account] != 0) {
             nonStakingSupply = nonStakingSupply.add(_amount);
         }
 
@@ -226,7 +226,7 @@ contract BaseToken is IERC20, IBaseToken {
         );
         totalSupply = totalSupply.sub(_amount);
 
-        if (nonStakingAccounts[_account]) {
+        if (nonStakingAccounts[_account] != 0) {
             nonStakingSupply = nonStakingSupply.sub(_amount);
         }
 
@@ -249,7 +249,7 @@ contract BaseToken is IERC20, IBaseToken {
 
         if (inPrivateTransferMode) {
             require(
-                isHandler[msg.sender],
+                isHandler[msg.sender] != 0,
                 "BaseToken: msg.sender not whitelisted"
             );
         }
@@ -263,10 +263,10 @@ contract BaseToken is IERC20, IBaseToken {
         );
         balances[_recipient] = balances[_recipient].add(_amount);
 
-        if (nonStakingAccounts[_sender]) {
+        if (nonStakingAccounts[_sender] != 0) {
             nonStakingSupply = nonStakingSupply.sub(_amount);
         }
-        if (nonStakingAccounts[_recipient]) {
+        if (nonStakingAccounts[_recipient] != 0) {
             nonStakingSupply = nonStakingSupply.add(_amount);
         }
 

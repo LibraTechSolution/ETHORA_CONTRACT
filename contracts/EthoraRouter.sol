@@ -24,11 +24,11 @@ contract EthoraRouter is AccessControlUpgradeable, IEthoraRouter {
     IAccountRegistrar public accountRegistrar;
 
     mapping(uint256 => QueuedTrade) public queuedTrades;
-    mapping(address => bool) public contractRegistry;
-    mapping(address => bool) public isKeeper;
-    mapping(bytes => bool) public prevSignature;
+    mapping(address => uint256) public contractRegistry;
+    mapping(address => uint256) public isKeeper;
+    mapping(bytes => uint256) public prevSignature;
     mapping(address => mapping(uint256 => OptionInfo)) public optionIdMapping;
-    mapping(address => bool) public override tradeds;
+    mapping(address => uint256) public override tradeds; 
 
     function initialize(
         address _publisher,
@@ -51,7 +51,7 @@ contract EthoraRouter is AccessControlUpgradeable, IEthoraRouter {
 
     function setContractRegistry(
         address targetContract,
-        bool register
+        uint256 register
     ) external onlyRole(DEFAULT_ADMIN_ROLE) {
         contractRegistry[targetContract] = register;
 
@@ -72,7 +72,7 @@ contract EthoraRouter is AccessControlUpgradeable, IEthoraRouter {
 
     function setKeeper(
         address _keeper,
-        bool _isActive
+        uint256 _isActive
     ) external onlyRole(DEFAULT_ADMIN_ROLE) {
         isKeeper[_keeper] = _isActive;
     }
@@ -212,7 +212,7 @@ contract EthoraRouter is AccessControlUpgradeable, IEthoraRouter {
                     continue;
                 }
             }
-            tradeds[user] = true;
+            tradeds[user] = 1;
 
             (address signer, uint256 nonce) = getAccountMapping(user);
             (bool isValid, string memory errorResaon) = verifyTrade(
@@ -430,7 +430,7 @@ contract EthoraRouter is AccessControlUpgradeable, IEthoraRouter {
      *  INTERNAL FUNCTIONS
      ***********************************************/
     function _validateKeeper() private view {
-        require(isKeeper[msg.sender], "Keeper: forbidden");
+        require(isKeeper[msg.sender] != 0, "Keeper: forbidden");
     }
 
     function getAccountMapping(
@@ -450,13 +450,13 @@ contract EthoraRouter is AccessControlUpgradeable, IEthoraRouter {
         SignInfo memory publisherSignInfo = params.publisherSignInfo;
         SignInfo memory userSignInfo = params.userSignInfo;
 
-        if (!contractRegistry[params.targetContract]) {
+        if (contractRegistry[params.targetContract] == 0) {
             return (false, "Router: Unauthorized contract");
         }
         if (queuedTrades[params.queueId].isTradeResolved) {
             return (false, "Router: Trade has already been opened");
         }
-        if (prevSignature[userSignInfo.signature]) {
+        if (prevSignature[userSignInfo.signature] != 0) {
             return (false, "Router: Signature already used");
         }
         if (!Validator.verifyUserTradeParams(params, user, tradeSigner)) {
@@ -586,7 +586,7 @@ contract EthoraRouter is AccessControlUpgradeable, IEthoraRouter {
             signer: tradeSigner,
             nonce: nonce
         });
-        prevSignature[params.userSignInfo.signature] = true;
+        prevSignature[params.userSignInfo.signature] = 1;
 
         emit OpenTrade(
             user,

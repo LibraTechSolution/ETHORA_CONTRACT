@@ -35,11 +35,11 @@ contract EthoraBinaryOptions is
 
     mapping(uint256 => Option) public override options;
     mapping(address => uint256[]) public userOptionIds;
-    mapping(address => bool) public approvedAddresses;
+    mapping(address => uint256) public approvedAddresses;
     mapping(uint256 => address) public override optionOwners;
-    bytes32 public ROUTER_ROLE;
-    bytes32 public PAUSER_ROLE;
-    bytes32 public IV_ROLE;
+    bytes32 private ROUTER_ROLE;
+    bytes32 private PAUSER_ROLE;
+    bytes32 private IV_ROLE;
 
     function initialize() external initializer {
         stepSize = 25;
@@ -193,9 +193,9 @@ contract EthoraBinaryOptions is
         uint256 closingTime,
         bool isAbove
     ) external override onlyRole(ROUTER_ROLE) {
-        require(optionID < nextTokenId, "O10");
+        require(optionID < nextTokenId, "Invalid optionID");
         Option storage option = options[optionID];
-        require(option.state == State.Active, "O5");
+        require(option.state == State.Active, "Invalid state");
 
         if (
             (isAbove && closingPrice > option.strike) ||
@@ -292,24 +292,24 @@ contract EthoraBinaryOptions is
         OptionParams calldata optionParams,
         uint256 slippage
     ) external view override returns (uint256 amount, uint256 revisedFee) {
-        require(slippage <= 5e2, "O34"); // 5% is the max slippage a user can use
-        require(optionParams.period >= config.minPeriod(), "O21");
-        require(optionParams.period <= config.maxPeriod(), "O25");
-        require(optionParams.totalFee >= config.minFee(), "O35");
-        require(!isPaused, "O33");
+        require(slippage <= 5e2, "Invalid slippage"); // 5% is the max slippage a user can use
+        require(optionParams.period >= config.minPeriod(), "period is too short");
+        require(optionParams.period <= config.maxPeriod(), "period is too long");
+        require(optionParams.totalFee >= config.minFee(), "invalid totalFee");
+        require(!isPaused, "paused");
         require(
             assetCategory == AssetCategory.Crypto ||
                 ICreationWindowContract(config.creationWindowContract())
                     .isInCreationWindow(optionParams.period),
-            "O30"
+            "invalid time"
         );
 
         uint256 maxTradeSize = getMaxTradeSize();
-        require(maxTradeSize != 0, "O36");
+        require(maxTradeSize != 0, "invalid trade size");
         revisedFee = min(optionParams.totalFee, maxTradeSize);
 
         if (revisedFee < optionParams.totalFee) {
-            require(optionParams.allowPartialFill, "O29");
+            require(optionParams.allowPartialFill, "not allow partial fill");
         }
 
         // Calculate the amount here from the revised fees
@@ -494,7 +494,7 @@ contract EthoraBinaryOptions is
     function approveAddress(
         address addressToApprove
     ) external onlyRole(DEFAULT_ADMIN_ROLE) {
-        approvedAddresses[addressToApprove] = true;
+        approvedAddresses[addressToApprove] = 1;
     }
 
     function setToken(

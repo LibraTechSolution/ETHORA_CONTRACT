@@ -17,7 +17,7 @@ contract SettlementFeeDistributor is AccessControlUpgradeable {
     address[] public shareHolders;
     uint256[] public shareHolderPercentages;
 
-    bytes32 public constant DISTRIBUTOR_ROLE = keccak256("DISTRIBUTOR_ROLE");
+    bytes32 private constant DISTRIBUTOR_ROLE = keccak256("DISTRIBUTOR_ROLE");
 
     ERC20Upgradeable public tokenX;
 

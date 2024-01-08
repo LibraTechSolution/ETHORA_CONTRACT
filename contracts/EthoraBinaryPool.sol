@@ -23,10 +23,10 @@ contract EthoraBinaryPool is
     uint256 public lockedPremium;
     uint256 public maxLiquidity;
     address public owner;
-    bytes32 public OPTION_ISSUER_ROLE;
+    bytes32 private OPTION_ISSUER_ROLE;
 
     mapping(address => LockedLiquidity[]) public lockedLiquidity;
-    mapping(address => bool) public isHandler;
+    mapping(address => uint256) public isHandler;
     mapping(address => ProvidedLiquidity) public liquidityPerUser;
 
     function initialize(
@@ -52,12 +52,12 @@ contract EthoraBinaryPool is
      */
     function setHandler(
         address _handler,
-        bool _isActive
+        uint256 _isActive
     ) external onlyRole(DEFAULT_ADMIN_ROLE) {
         isHandler[_handler] = _isActive;
     }
 
-    function setTokenX(address token_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    function setTokenX(address token_) external payable onlyRole(DEFAULT_ADMIN_ROLE) {
         tokenX = ERC20Upgradeable(token_);
     }
 
@@ -93,7 +93,7 @@ contract EthoraBinaryPool is
         address _recipient,
         uint256 _amount
     ) public virtual override returns (bool) {
-        if (isHandler[msg.sender]) {
+        if (isHandler[msg.sender] != 0) {
             _transfer(_sender, _recipient, _amount);
             return true;
         }
@@ -189,7 +189,7 @@ contract EthoraBinaryPool is
      * @notice Called by EthoraOptions to unlock the funds
      * @param id Id of LockedLiquidity that should be unlocked
      */
-    function unlock(uint256 id) external override onlyRole(OPTION_ISSUER_ROLE) {
+    function unlock(uint256 id) external payable override onlyRole(OPTION_ISSUER_ROLE) {
         uint256 premium = _unlock(id);
 
         emit Profit(id, premium);
@@ -241,12 +241,12 @@ contract EthoraBinaryPool is
             "reached max limit"
         );
 
-        if (supply > 0 && balance > 0)
+        if (supply != 0 && balance != 0)
             mint = (tokenXAmount * supply) / (balance);
         else mint = tokenXAmount * INITIAL_RATE;
 
         require(mint >= minMint, "Pool: Mint limit is too large");
-        require(mint > 0, "Pool: Amount is too small");
+        require(mint != 0, "Pool: Amount is too small");
 
         tokenX.safeTransferFrom(account, address(this), tokenXAmount);
 
@@ -298,7 +298,7 @@ contract EthoraBinaryPool is
     }
 
     function _validateHandler() private view {
-        require(isHandler[msg.sender], "Pool: forbidden");
+        require(isHandler[msg.sender] != 0, "Pool: forbidden");
     }
 
     function _withdraw(
@@ -328,7 +328,7 @@ contract EthoraBinaryPool is
             "Pool: exceed unlocked amount"
         );
         require(burn <= balanceOf(account), "Pool: Amount is too large");
-        require(burn > 0, "Pool: Amount is too small");
+        require(burn != 0, "Pool: Amount is too small");
 
         _burn(account, burn);
 
@@ -352,7 +352,7 @@ contract EthoraBinaryPool is
         address to,
         uint256 value
     ) internal override {
-        if (!isHandler[from] && !isHandler[to] && from != address(0)) {
+        if (isHandler[from] == 0 && isHandler[to] == 0 && from != address(0)) {
             _updateLiquidity(from);
             require(
                 liquidityPerUser[from].unlockedAmount >= value,
@@ -382,7 +382,7 @@ contract EthoraBinaryPool is
     function toTokenX(uint256 amount) public view returns (uint256) {
         uint256 totalSupply = totalSupply();
         uint256 balance = totalTokenXBalance();
-        if (totalSupply > 0) {
+        if (totalSupply != 0) {
             return (amount * balance) / totalSupply;
         }
         return 0;
