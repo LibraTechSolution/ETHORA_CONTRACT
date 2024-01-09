@@ -132,13 +132,13 @@ interface IEthoraRouter {
         uint256 revisedFee
     );
 
-    function tradeds(address) external view returns (bool);
+    function tradeds(address) external view returns (uint256);
 
     event CancelTrade(address indexed account, uint256 queueId, string reason);
     event FailUnlock(uint256 optionId, address targetContract, string reason);
     event FailResolve(uint256 queueId, string reason);
     event FailRevoke(address user, address tokenX, string reason);
-    event ContractRegistryUpdated(address targetContract, bool register);
+    event ContractRegistryUpdated(address targetContract, uint256 register);
     event ApproveRouter(
         address user,
         uint256 nonce,
@@ -194,6 +194,12 @@ interface IEthoraBinaryOptions {
 
     event LpProfit(uint256 indexed id, uint256 amount);
     event LpLoss(uint256 indexed id, uint256 amount);
+
+     function transferFee(
+        address user,
+        address admin,
+        uint256 revisedFee
+    ) external;
 
     function createFromRouter(
         OptionParams calldata optionParams,
@@ -330,7 +336,7 @@ interface ILiquidityPool {
         uint256 writeAmount
     );
 
-    function unlock(uint256 id) external;
+    function unlock(uint256 id) external payable;
 
     function totalTokenXBalance() external view returns (uint256 amount);
 

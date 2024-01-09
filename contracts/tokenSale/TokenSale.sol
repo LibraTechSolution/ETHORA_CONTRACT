@@ -479,7 +479,7 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
 
         uint256 tokensDistributedAcrossPools;
 
-        for (uint8 i = 0; i < NUMBER_POOLS; i++) {
+        for (uint8 i; i < NUMBER_POOLS; i++) {
             tokensDistributedAcrossPools = tokensDistributedAcrossPools.add(
                 _poolInformation[i].offeringAmountPool
             );
@@ -603,7 +603,7 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
         uint8[] calldata _pids
     ) external view override returns (uint256[] memory) {
         uint256[] memory allocationPools = new uint256[](_pids.length);
-        for (uint8 i = 0; i < _pids.length; i++) {
+        for (uint8 i; i < _pids.length; i++) {
             allocationPools[i] = _getUserAllocationPool(_user, _pids[i]);
         }
         return allocationPools;
@@ -621,7 +621,7 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
         uint256[] memory amountPools = new uint256[](_pids.length);
         bool[] memory statusPools = new bool[](_pids.length);
 
-        for (uint8 i = 0; i < NUMBER_POOLS; i++) {
+        for (uint8 i; i < NUMBER_POOLS; i++) {
             amountPools[i] = _userInfo[_user][i].amountPool;
             statusPools[i] = _userInfo[_user][i].claimedPool;
         }
@@ -639,7 +639,7 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
     ) external view override returns (uint256[3][] memory) {
         uint256[3][] memory amountPools = new uint256[3][](_pids.length);
 
-        for (uint8 i = 0; i < _pids.length; i++) {
+        for (uint8 i; i < _pids.length; i++) {
             uint256 userOfferingAmountPool;
             uint256 userRefundingAmountPool;
             uint256 userTaxAmountPool;
@@ -818,7 +818,7 @@ contract TokenSale is ITokenSale, ReentrancyGuardUpgradeable, Whitelist {
         address _holder,
         uint256 _index
     ) public pure returns (bytes32) {
-        return keccak256(abi.encodePacked(_holder, _index));
+        return keccak256(abi.encode(_holder, _index));
     }
 
     /**

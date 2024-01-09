@@ -17,7 +17,7 @@ contract SettlementFeeDistributor is AccessControlUpgradeable {
     address[] public shareHolders;
     uint256[] public shareHolderPercentages;
 
-    bytes32 public constant DISTRIBUTOR_ROLE = keccak256("DISTRIBUTOR_ROLE");
+    bytes32 private constant DISTRIBUTOR_ROLE = keccak256("DISTRIBUTOR_ROLE");
 
     ERC20Upgradeable public tokenX;
 
@@ -41,7 +41,7 @@ contract SettlementFeeDistributor is AccessControlUpgradeable {
             "Array length of shareholders and shareholder percents don't match"
         );
         uint256 totalShareHolderPercentage;
-        for (uint256 n = 0; n < _shareHolderPercentages.length; n++) {
+        for (uint256 n; n < _shareHolderPercentages.length; n++) {
             totalShareHolderPercentage += _shareHolderPercentages[n];
         }
         require(
@@ -56,7 +56,7 @@ contract SettlementFeeDistributor is AccessControlUpgradeable {
     function distribute() external onlyRole(DISTRIBUTOR_ROLE) {
         uint256 contractBalance = tokenX.balanceOf(address(this));
         uint256 remainingBalance = contractBalance;
-        for (uint256 n = 0; n < shareHolders.length; n++) {
+        for (uint256 n; n < shareHolders.length; n++) {
             if (n == (shareHolders.length) - 1) {
                 tokenX.safeTransfer(shareHolders[n], remainingBalance);
             } else {

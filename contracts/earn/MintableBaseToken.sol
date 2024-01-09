@@ -6,7 +6,7 @@ import "./BaseToken.sol";
 import "./../interfaces/IMintable.sol";
 
 contract MintableBaseToken is BaseToken, IMintable {
-    mapping(address => bool) public override isMinter;
+    mapping(address => uint256) public override isMinter;
 
     constructor(
         string memory _name,
@@ -15,13 +15,13 @@ contract MintableBaseToken is BaseToken, IMintable {
     ) BaseToken(_name, _symbol, _initialSupply) {}
 
     modifier onlyMinter() {
-        require(isMinter[msg.sender], "MintableBaseToken: forbidden");
+        require(isMinter[msg.sender] != 0, "MintableBaseToken: forbidden");
         _;
     }
 
     function setMinter(
         address _minter,
-        bool _isActive
+        uint256 _isActive
     ) external override onlyGov {
         isMinter[_minter] = _isActive;
     }

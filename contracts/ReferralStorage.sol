@@ -17,7 +17,7 @@ contract ReferralStorage is IReferralStorage, Ownable2Step {
     mapping(string => address) public override codeOwner;
     mapping(address => string) public userCode;
     mapping(address => string) public override traderReferralCodes;
-    mapping(address => bool) public operators;
+    mapping(address => uint256) public operators;
 
     constructor(address router_) {
         router = IEthoraRouter(router_);
@@ -34,11 +34,11 @@ contract ReferralStorage is IReferralStorage, Ownable2Step {
         uint8[3] calldata _referrerTierStep,
         uint32[3] calldata _referrerTierDiscount // Factor of 1e5
     ) external onlyOwner {
-        for (uint8 i = 0; i < 3; i++) {
+        for (uint8 i; i < 3; i++) {
             referrerTierStep[i] = _referrerTierStep[i];
         }
 
-        for (uint8 i = 0; i < 3; i++) {
+        for (uint8 i; i < 3; i++) {
             referrerTierDiscount[i] = _referrerTierDiscount[i];
         }
     }
@@ -47,7 +47,7 @@ contract ReferralStorage is IReferralStorage, Ownable2Step {
      *  ADMIN ONLY FUNCTIONS
      ***********************************************/
 
-    function setOperator(address operator, bool state) external onlyOwner {
+    function setOperator(address operator, uint256 state) external onlyOwner {
         operators[operator] = state;
     }
 
@@ -56,7 +56,7 @@ contract ReferralStorage is IReferralStorage, Ownable2Step {
      */
     function setReferrerTier(address _referrer, uint8 tier) external override {
         require(tier < 3);
-        require(operators[msg.sender], "ReferralStorage: not operator");
+        require(operators[msg.sender] != 0, "ReferralStorage: not operator");
         referrerTier[_referrer] = tier;
         emit UpdateReferrerTier(_referrer, tier);
     }
@@ -68,7 +68,7 @@ contract ReferralStorage is IReferralStorage, Ownable2Step {
         address user,
         string memory _code
     ) external override {
-        require(operators[msg.sender], "ReferralStorage: not operator");
+        require(operators[msg.sender] != 0, "ReferralStorage: not operator");
         _setTraderReferralCode(user, _code);
     }
 
@@ -119,7 +119,7 @@ contract ReferralStorage is IReferralStorage, Ownable2Step {
      ***********************************************/
 
     function _setTraderReferralCode(address user, string memory _code) private {
-        require(!router.tradeds(user), "ReferralStorage: traded");
+        require(router.tradeds(user) == 0, "ReferralStorage: traded");
         require(
             codeOwner[_code] != address(0),
             "ReferralStorage: code not exist"

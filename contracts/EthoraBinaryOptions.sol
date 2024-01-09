@@ -35,11 +35,11 @@ contract EthoraBinaryOptions is
 
     mapping(uint256 => Option) public override options;
     mapping(address => uint256[]) public userOptionIds;
-    mapping(address => bool) public approvedAddresses;
+    mapping(address => uint256) public approvedAddresses;
     mapping(uint256 => address) public override optionOwners;
-    bytes32 public ROUTER_ROLE;
-    bytes32 public PAUSER_ROLE;
-    bytes32 public IV_ROLE;
+    bytes32 private ROUTER_ROLE;
+    bytes32 private PAUSER_ROLE;
+    bytes32 private IV_ROLE;
 
     function initialize() external initializer {
         stepSize = 25;
@@ -97,14 +97,14 @@ contract EthoraBinaryOptions is
     /**
      * @notice Grants complete approval from the pool
      */
-    function approvePoolToTransferTokenX() public {
+    function approvePoolToTransferTokenX() external {
         tokenX.approve(address(pool), ~uint256(0));
     }
 
     /**
      * @notice Pauses/Unpauses the option creation
      */
-    function setIsPaused() public {
+    function setIsPaused() external {
         if (hasRole(PAUSER_ROLE, msg.sender)) {
             isPaused = true;
         } else if (hasRole(DEFAULT_ADMIN_ROLE, msg.sender)) {
@@ -119,6 +119,15 @@ contract EthoraBinaryOptions is
      *  ROUTER ONLY FUNCTIONS
      ***********************************************/
 
+    function transferFee(
+        address user,
+        address admin,
+        uint256 revisedFee
+    ) external override onlyRole(ROUTER_ROLE) {
+        tokenX.safeTransferFrom(user, admin, config.platformFee());
+        tokenX.safeTransferFrom(user, address(this), revisedFee);
+    }
+
     /**
      * @notice Creates an option with the specified parameters
      * @dev Can only be called by router
@@ -132,7 +141,7 @@ contract EthoraBinaryOptions is
             optionParams.strike,
             optionParams.amount,
             optionParams.amount,
-            optionParams.amount / 2,
+            optionParams.amount >> 1,
             queuedTime + optionParams.period,
             optionParams.totalFee,
             queuedTime
@@ -184,9 +193,9 @@ contract EthoraBinaryOptions is
         uint256 closingTime,
         bool isAbove
     ) external override onlyRole(ROUTER_ROLE) {
-        require(optionID < nextTokenId, "O10");
+        require(optionID < nextTokenId, "Invalid optionID");
         Option storage option = options[optionID];
-        require(option.state == State.Active, "O5");
+        require(option.state == State.Active, "Invalid state");
 
         if (
             (isAbove && closingPrice > option.strike) ||
@@ -227,7 +236,7 @@ contract EthoraBinaryOptions is
         string calldata referralCode,
         uint256 baseSettlementFeePercentage
     )
-        public
+        external
         view
         override
         returns (uint256 total, uint256 settlementFee, uint256 premium)
@@ -266,7 +275,7 @@ contract EthoraBinaryOptions is
             );
     }
 
-    function getMaxOI() public view returns (uint256) {
+    function getMaxOI() external view returns (uint256) {
         return
             min(
                 IPoolOIConfig(config.poolOIConfigContract()).getPoolOICap(),
@@ -283,24 +292,24 @@ contract EthoraBinaryOptions is
         OptionParams calldata optionParams,
         uint256 slippage
     ) external view override returns (uint256 amount, uint256 revisedFee) {
-        require(slippage <= 5e2, "O34"); // 5% is the max slippage a user can use
-        require(optionParams.period >= config.minPeriod(), "O21");
-        require(optionParams.period <= config.maxPeriod(), "O25");
-        require(optionParams.totalFee >= config.minFee(), "O35");
-        require(!isPaused, "O33");
+        require(slippage <= 5e2, "Invalid slippage"); // 5% is the max slippage a user can use
+        require(optionParams.period >= config.minPeriod(), "period is too short");
+        require(optionParams.period <= config.maxPeriod(), "period is too long");
+        require(optionParams.totalFee >= config.minFee(), "invalid totalFee");
+        require(!isPaused, "paused");
         require(
             assetCategory == AssetCategory.Crypto ||
                 ICreationWindowContract(config.creationWindowContract())
                     .isInCreationWindow(optionParams.period),
-            "O30"
+            "invalid time"
         );
 
         uint256 maxTradeSize = getMaxTradeSize();
-        require(maxTradeSize > 0, "O36");
+        require(maxTradeSize != 0, "invalid trade size");
         revisedFee = min(optionParams.totalFee, maxTradeSize);
 
         if (revisedFee < optionParams.totalFee) {
-            require(optionParams.allowPartialFill, "O29");
+            require(optionParams.allowPartialFill, "not allow partial fill");
         }
 
         // Calculate the amount here from the revised fees
@@ -420,7 +429,7 @@ contract EthoraBinaryOptions is
                 referral.referrerTierDiscount(
                     referral.referrerTier(referrer)
                 )) / (1e4 * 1e3));
-            if (referrerFee > 0) {
+            if (referrerFee != 0) {
                 tokenX.safeTransfer(referrer, referrerFee);
 
                 (uint256 formerUnitFee, , ) = _fees(
@@ -484,14 +493,14 @@ contract EthoraBinaryOptions is
 
     function approveAddress(
         address addressToApprove
-    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        approvedAddresses[addressToApprove] = true;
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        approvedAddresses[addressToApprove] = 1;
     }
 
     function setToken(
         string memory _token0,
         string memory _token1
-    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
         token0 = _token0;
         token1 = _token1;
     }

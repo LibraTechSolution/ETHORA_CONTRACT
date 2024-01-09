@@ -91,12 +91,13 @@ contract RewardDistributor is IRewardDistributor, ReentrancyGuard, Governable {
 
         lastDistributionTime = block.timestamp;
 
-        uint256 balance = IERC20(rewardToken).balanceOf(address(this));
+        IERC20 token = IERC20(rewardToken);
+        uint256 balance = token.balanceOf(address(this));
         if (amount > balance) {
             amount = balance;
         }
 
-        IERC20(rewardToken).safeTransfer(msg.sender, amount);
+        token.safeTransfer(msg.sender, amount);
 
         emit Distribute(amount);
         return amount;

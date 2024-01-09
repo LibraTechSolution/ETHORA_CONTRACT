@@ -12,7 +12,6 @@ contract Faucet is Ownable2Step {
     uint256 public fee = 1e15; // 0.001 ETH
     address public fee_collector;
     mapping(address => uint256) public lastSavedTimestamp;
-    mapping(bytes32 => bool) public previousHashedMessages;
 
     constructor(
         address _token,

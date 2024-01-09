@@ -23,7 +23,7 @@ contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
     string public symbol;
 
     address public distributor;
-    mapping(address => bool) public isDepositToken;
+    mapping(address => uint256) public isDepositToken;
     mapping(address => mapping(address => uint256))
         public
         override depositBalances;
@@ -43,7 +43,7 @@ contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
     bool public inPrivateTransferMode;
     bool public inPrivateStakingMode;
     bool public inPrivateClaimingMode;
-    mapping(address => bool) public isHandler;
+    mapping(address => uint256) public isHandler;
 
     event Claim(address receiver, uint256 amount);
 
@@ -56,9 +56,9 @@ contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
         address[] memory _depositTokens,
         address _distributor
     ) external onlyGov {
-        for (uint256 i = 0; i < _depositTokens.length; i++) {
+        for (uint256 i; i < _depositTokens.length; i++) {
             address depositToken = _depositTokens[i];
-            isDepositToken[depositToken] = true;
+            isDepositToken[depositToken] = 1;
         }
 
         distributor = _distributor;
@@ -66,7 +66,7 @@ contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
 
     function setDepositToken(
         address _depositToken,
-        bool _isDepositToken
+        uint256 _isDepositToken
     ) external onlyGov {
         isDepositToken[_depositToken] = _isDepositToken;
     }
@@ -89,7 +89,7 @@ contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
         inPrivateClaimingMode = _inPrivateClaimingMode;
     }
 
-    function setHandler(address _handler, bool _isActive) external onlyGov {
+    function setHandler(address _handler, uint256 _isActive) external onlyGov {
         isHandler[_handler] = _isActive;
     }
 
@@ -176,7 +176,7 @@ contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
         address _recipient,
         uint256 _amount
     ) external override returns (bool) {
-        if (isHandler[msg.sender]) {
+        if (isHandler[msg.sender] != 0) {
             _transfer(_sender, _recipient, _amount);
             return true;
         }
@@ -341,7 +341,7 @@ contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
     }
 
     function _validateHandler() private view {
-        require(isHandler[msg.sender], "RewardTracker: forbidden");
+        require(isHandler[msg.sender] != 0, "RewardTracker: forbidden");
     }
 
     function _stake(
@@ -352,7 +352,7 @@ contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
     ) private {
         require(_amount > 0, "RewardTracker: invalid _amount");
         require(
-            isDepositToken[_depositToken],
+            isDepositToken[_depositToken] != 0,
             "RewardTracker: invalid _depositToken"
         );
 
@@ -382,7 +382,7 @@ contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
     ) private {
         require(_amount > 0, "RewardTracker: invalid _amount");
         require(
-            isDepositToken[_depositToken],
+            isDepositToken[_depositToken] != 0,
             "RewardTracker: invalid _depositToken"
         );
 
