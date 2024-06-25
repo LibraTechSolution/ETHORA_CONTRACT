@@ -23,7 +23,7 @@ contract EthoraBinaryPool is
     uint256 public lockedPremium;
     uint256 public maxLiquidity;
     address public owner;
-    bytes32 private OPTION_ISSUER_ROLE;
+    bytes32 public OPTION_ISSUER_ROLE;
 
     mapping(address => LockedLiquidity[]) public lockedLiquidity;
     mapping(address => uint256) public isHandler;

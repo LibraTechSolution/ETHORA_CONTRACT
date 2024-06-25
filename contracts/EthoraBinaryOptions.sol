@@ -37,9 +37,9 @@ contract EthoraBinaryOptions is
     mapping(address => uint256[]) public userOptionIds;
     mapping(address => uint256) public approvedAddresses;
     mapping(uint256 => address) public override optionOwners;
-    bytes32 private ROUTER_ROLE;
-    bytes32 private PAUSER_ROLE;
-    bytes32 private IV_ROLE;
+    bytes32 public ROUTER_ROLE;
+    bytes32 public PAUSER_ROLE;
+    bytes32 public IV_ROLE;
 
     function initialize() external initializer {
         stepSize = 25;
@@ -119,14 +119,14 @@ contract EthoraBinaryOptions is
      *  ROUTER ONLY FUNCTIONS
      ***********************************************/
 
-    function transferFee(
-        address user,
-        address admin,
-        uint256 revisedFee
-    ) external override onlyRole(ROUTER_ROLE) {
-        tokenX.safeTransferFrom(user, admin, config.platformFee());
-        tokenX.safeTransferFrom(user, address(this), revisedFee);
-    }
+    // function transferFee(
+    //     address user,
+    //     address admin,
+    //     uint256 revisedFee
+    // ) external override onlyRole(ROUTER_ROLE) {
+    //     tokenX.safeTransferFrom(user, admin, config.platformFee());
+    //     tokenX.safeTransferFrom(user, address(this), revisedFee);
+    // }
 
     /**
      * @notice Creates an option with the specified parameters

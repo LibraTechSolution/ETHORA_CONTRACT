@@ -553,10 +553,11 @@ contract EthoraRouter is AccessControlUpgradeable, IEthoraRouter {
         // Transfer the fee specified from the user to options contract.
         // User has to approve first inorder to execute this function
 
-        try optionsContract.transferFee(user, admin, revisedFee) {
-        } catch Error(string memory reason) {
-            emit CancelTrade(user, params.queueId, reason);
-        }
+        ERC20Upgradeable tokenX = ERC20Upgradeable(optionsContract.tokenX());
+
+        tokenX.safeTransferFrom(user, admin, config.platformFee());
+        tokenX.safeTransferFrom(user, params.targetContract, revisedFee);
+
         optionParams.strike = params.price;
         optionParams.amount = amount;
         optionParams.totalFee = revisedFee;

@@ -11,7 +11,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
  */
 contract AccountRegistrar is IAccountRegistrar, AccessControl {
     mapping(address => AccountMapping) public override accountMapping;
-    bytes32 private constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
+    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
 
     constructor() {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);

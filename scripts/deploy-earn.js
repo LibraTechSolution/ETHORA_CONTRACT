@@ -80,7 +80,7 @@ async function main() {
 
   let SbfETRDis = await ethers.getContractFactory('RewardDistributor')
   let sbfETRDis = await SbfETRDis.deploy(
-    "0xA3f66f2EeEe48d4420B7815EBF61216666311B33", // USDC
+    "0x22F2D35C812Ad4Fe5B8AA3658a5E3Fc1c3D7bA27", // USDC
     sbfETR.address // sbfETR
   )
   await sbfETRDis.deployed();
@@ -97,7 +97,7 @@ async function main() {
 
   let FELPDis = await ethers.getContractFactory('RewardDistributor')
   let fELPDis = await FELPDis.deploy(
-    "0xA3f66f2EeEe48d4420B7815EBF61216666311B33", // USDC
+    "0x22F2D35C812Ad4Fe5B8AA3658a5E3Fc1c3D7bA27", // USDC
     fELP.address // fELP
   )
   await fELPDis.deployed();
@@ -153,11 +153,11 @@ async function main() {
 
   let Router = await ethers.getContractFactory("RewardRouter");
   let router = await upgrades.deployProxy(Router, [
-    "0xA3f66f2EeEe48d4420B7815EBF61216666311B33",
+    "0x22F2D35C812Ad4Fe5B8AA3658a5E3Fc1c3D7bA27",  //usdc
     etr.address,
     esEtr.address,
     bnEtr.address,
-    "0xb935Dcb88cae8dc4C016E4Bcd2f6115192ae4009",
+    "0xF6d6fda1337D5E4aBe582f2f9D66BFDA42A1Ad92",
     sETR.address,
     sbETR.address,
     sbfETR.address,
@@ -171,31 +171,31 @@ async function main() {
   await router.deployed();
   console.log("RewardRouter address:", router.address);
 
-  let Fee = await ethers.getContractFactory("SettlementFeeDistributor");
-  let fee = await upgrades.deployProxy(Fee, [
-    "0xA3f66f2EeEe48d4420B7815EBF61216666311B33" //USDC
-  ], {
-    initializer: "initialize",
-  });
-  await fee.deployed();
-  console.log("SettlementFeeDistributor address:", fee.address);
+  // let Fee = await ethers.getContractFactory("SettlementFeeDistributor");
+  // let fee = await upgrades.deployProxy(Fee, [
+  //   "0x22F2D35C812Ad4Fe5B8AA3658a5E3Fc1c3D7bA27" //USDC
+  // ], {
+  //   initializer: "initialize",
+  // });
+  // await fee.deployed();
+  // console.log("SettlementFeeDistributor address:", fee.address);
 
-  await sleep(4000);
+  // await sleep(4000);
 
-  await fee.setShareHolderDetails(
-    [
-      fELPDis.address,
-      sbfETRDis.address,
-      "0xc9Be5A7DFc35492C9aA6EE8bF018bF2BFa8E3119"
-    ],
-    [
-        6500,
-        2500,
-        1000
-    ]
-  );
-  console.log(1);
-  await sleep(4000);
+  // await fee.setShareHolderDetails(
+  //   [
+  //     fELPDis.address,
+  //     sbfETRDis.address,
+  //     "0xc9Be5A7DFc35492C9aA6EE8bF018bF2BFa8E3119"
+  //   ],
+  //   [
+  //       6500,
+  //       2500,
+  //       1000
+  //   ]
+  // );
+  // console.log(1);
+  // await sleep(4000);
 
   await sETR.initialize(
     [
@@ -228,7 +228,7 @@ async function main() {
 
   await fELP.initialize(
     [
-      "0xb935Dcb88cae8dc4C016E4Bcd2f6115192ae4009"
+      "0xF6d6fda1337D5E4aBe582f2f9D66BFDA42A1Ad92" //elp
     ],
     fELPDis.address
   );

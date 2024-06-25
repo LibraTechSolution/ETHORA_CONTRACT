@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract PoolOIStorage is AccessControl {
     uint256 public totalPoolOI;
-    bytes32 private constant UPDATOR_ROLE = keccak256("UPDATOR_ROLE");
+    bytes32 public constant UPDATOR_ROLE = keccak256("UPDATOR_ROLE");
     event UpdatePoolOI(bool indexed isIncreased, uint256 indexed interest);
 
     constructor() {

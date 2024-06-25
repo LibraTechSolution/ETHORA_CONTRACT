@@ -11,27 +11,27 @@ async function main() {
 
   let Fee = await ethers.getContractFactory("SettlementFeeDistributor");
   let fee = await upgrades.deployProxy(Fee, [
-    "0x406E0ffa0D7675bb0AF77A319fA34F13B762B0b7"
+    "0x22F2D35C812Ad4Fe5B8AA3658a5E3Fc1c3D7bA27"
   ], {
     initializer: "initialize",
   });
   await fee.deployed();
   console.log("SettlementFeeDistributor address:", fee.address);
 
-  await fee.setShareHolderDetails(
-    [
-      "0x2818Ece980Ef660126075E71608F8337BD95A69b",
-      "0x1A4fe9A6534Ad24081f5A1626D8158B96920e0D0",
-      "0xc9Be5A7DFc35492C9aA6EE8bF018bF2BFa8E3119"
-    ],
-    [
-        6500,
-        2500,
-        1000
-    ]
-  );
-  console.log(1);
-  await sleep(4000);
+  // await fee.setShareHolderDetails(
+  //   [
+  //     "0x2818Ece980Ef660126075E71608F8337BD95A69b",
+  //     "0x1A4fe9A6534Ad24081f5A1626D8158B96920e0D0",
+  //     "0xc9Be5A7DFc35492C9aA6EE8bF018bF2BFa8E3119"
+  //   ],
+  //   [
+  //       6500,
+  //       2500,
+  //       1000
+  //   ]
+  // );
+  // console.log(1);
+  // await sleep(4000);
 
 }
 

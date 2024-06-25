@@ -70,13 +70,18 @@ module.exports = {
       blockGasLimit: 15000000,
       timeout: 20000,
     },
-    base: {
-      url: "https://goerli.base.org",
-      chainId: 84531	,
+    baseSepolia: {
+      url: "https://sepolia.base.org",
+      chainId: 84532,
       gasPrice: 1000000000,
       accounts: [mnemonic],
       gasLimit: 200000,
     },
+    base: {
+      url: "https://mainnet.base.org",
+      chainId: 	8453,
+      accounts: [mnemonic],
+    }
   },
   solidity: {
     compilers: [
@@ -137,10 +142,10 @@ module.exports = {
     customChains: [
       {
         network: "base",
-        chainId: 84531,
+        chainId: 8453,
         urls: {
-         apiURL: "https://api-goerli.basescan.org/api",
-         browserURL: "https://goerli.basescan.org"
+         apiURL: "https://api.basescan.org/api",
+         browserURL: "https://basescan.org"
         }
       }
     ]
