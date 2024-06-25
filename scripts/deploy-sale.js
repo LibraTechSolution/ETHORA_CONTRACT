@@ -18,8 +18,8 @@ async function main() {
   console.log("TokenSale address:", ts.address);
 
   await ts.initSale(
-    "0x22F2D35C812Ad4Fe5B8AA3658a5E3Fc1c3D7bA27",
-    "0x22B794F7c8fAa61044E66DC9FddCadFcc829694B",
+    "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    "0x0000000000000000000000000000000000000000",
     1719392400,
     1750928400,
     60480,
